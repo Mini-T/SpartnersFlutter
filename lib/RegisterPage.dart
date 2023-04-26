@@ -38,21 +38,26 @@ class _RegisterPageState extends State<RegisterPage> {
               onSaved: (value) => _email = value!,
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Pseudonyme'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Veuillez saisir votre pseudonyme';
-                }
-                return null;
-              },
-              onSaved: (value) => _username = value!,
-            ),
-            TextFormField(
               decoration: InputDecoration(labelText: 'Mot de passe'),
               obscureText: true,
               validator: (value) {
+                _password = value!;
                 if (value!.isEmpty) {
                   return 'Veuillez saisir votre mot de passe';
+                }
+                return null;
+              },
+              onSaved: (value) => _password = value!,
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Confirmer mot de passe'),
+              obscureText: true,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Veuillez Confirmer votre mot de passe';
+                }
+                if (value != _password) {
+                  return 'Les mots de passes ne correspondent pas';
                 }
                 return null;
               },
@@ -62,9 +67,12 @@ class _RegisterPageState extends State<RegisterPage> {
             ElevatedButton(
               child: Text('Créer un compte'),
               onPressed: () {
-                _controller.nextPage(
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.linear);
+                if (_email != '' && _password != '') {
+
+                  _controller.nextPage(
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.linear);
+                }
               },
             ),
           ],
