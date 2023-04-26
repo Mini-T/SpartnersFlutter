@@ -15,9 +15,6 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
-  String _email = "";
-  String _username = "";
-  String _password = "";
   String _firstname = '';
   String _lastname = '';
   String _level = '';
@@ -31,6 +28,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final _controller = PageController(initialPage: 0);
 
+  bool validateEmail(String email) {
+    // Créer la regex pour valider l'email
+    final RegExp regex = RegExp(
+        r"^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+    );
+
+    // Vérifier si l'email correspond à la regex
+    return regex.hasMatch(email);
+    }
+
   Padding formPart1() => Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(
@@ -40,6 +47,9 @@ class _RegisterPageState extends State<RegisterPage> {
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Veuillez saisir votre email';
+                };
+                if(!validateEmail(value!)){
+                  return "Veuillez saisir un email valide";
                 }
                 return null;
               },
@@ -71,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ElevatedButton(
               child: Text('Créer un compte'),
               onPressed: () {
-                if (_emailController.text != '' && _passwordController.text == _confirmPasswordController.text) {
+                if (_emailKey.currentState!.validate() && _passwordKey.currentState!.validate() && _confirmPasswordKey.currentState!.validate()) {
                   _controller.nextPage(
                       duration: Duration(milliseconds: 300),
                       curve: Curves.linear);
