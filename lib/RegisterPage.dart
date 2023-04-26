@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -7,6 +9,12 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _confirmPasswordKey = GlobalKey<FormFieldState>();
+  final _emailKey = GlobalKey<FormFieldState>();
+  final _passwordKey = GlobalKey<FormFieldState>();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _confirmPasswordController = TextEditingController();
   String _email = "";
   String _username = "";
   String _password = "";
@@ -27,7 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
-            TextFormField(
+            TextFormField(key: _emailKey, controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
               validator: (value) {
                 if (value!.isEmpty) {
@@ -35,40 +43,35 @@ class _RegisterPageState extends State<RegisterPage> {
                 }
                 return null;
               },
-              onSaved: (value) => _email = value!,
             ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Mot de passe'),
+            TextFormField(key: _passwordKey, controller: _passwordController,
+              decoration: InputDecoration(labelText: "Mot de passe"),
               obscureText: true,
               validator: (value) {
-                _password = value!;
                 if (value!.isEmpty) {
                   return 'Veuillez saisir votre mot de passe';
                 }
                 return null;
               },
-              onSaved: (value) => _password = value!,
             ),
-            TextFormField(
+            TextFormField(key: _confirmPasswordKey, controller: _confirmPasswordController ,
               decoration: InputDecoration(labelText: 'Confirmer mot de passe'),
               obscureText: true,
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Veuillez Confirmer votre mot de passe';
                 }
-                if (value != _password) {
+                if (value != _passwordController.text) {
                   return 'Les mots de passes ne correspondent pas';
                 }
                 return null;
               },
-              onSaved: (value) => _password = value!,
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
               child: Text('Créer un compte'),
               onPressed: () {
-                if (_email != '' && _password != '') {
-
+                if (_emailController.text != '' && _passwordController.text == _confirmPasswordController.text) {
                   _controller.nextPage(
                       duration: Duration(milliseconds: 300),
                       curve: Curves.linear);
