@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
-
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -15,46 +18,68 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
-  String _firstname = '';
-  String _lastname = '';
-  String _level = '';
-  String _objective = '';
-  String _sexe = '';
-  int? _age = null;
-  String _city = '';
+  DateTime birthDate = DateTime.now();
   bool _isSubscribedToSportsHall = false;
-  String _sportsHall = '';
-  Map<String, dynamic> _userProfile = {};
+  Map<String, dynamic> httpPayload = {
+    'email': '',
+    "password": "",
+    "firstname": "",
+    "lastname": "",
+    "sex": "",
+    "city": "",
+    "age": null,
+    "level": "",
+    "objective": "",
+    "description": "",
+    "allowLocation": false,
+    "premium": false,
+    "latitude": null,
+    "longitude": null
+  };
 
   final _controller = PageController(initialPage: 0);
 
-  bool validateEmail(String email) {
-    // Créer la regex pour valider l'email
-    final RegExp regex = RegExp(
-        r"^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
-    );
-
-    // Vérifier si l'email correspond à la regex
-    return regex.hasMatch(email);
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime nowUtc = DateTime.now().toUtc();
+    DateTime eighteenYearsAgo = DateTime.utc(nowUtc.year - 18, nowUtc.month, nowUtc.day);
+    final DateTime? picked =
+        await showDatePicker(context: context, firstDate: DateTime.utc(1940), initialDate: eighteenYearsAgo, lastDate: eighteenYearsAgo);
+    if (picked != null && picked != birthDate) {
+      setState(() {
+        birthDate = picked;
+      });
     }
+  }
+
+  bool validateEmail(String email) {
+    final RegExp regex = RegExp(
+      r"^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$",
+    );
+    return regex.hasMatch(email);
+  }
 
   Padding formPart1() => Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
-            TextFormField(key: _emailKey, controller: _emailController,
+            TextFormField(
+              key: _emailKey,
+              controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
               validator: (value) {
                 if (value!.isEmpty) {
                   return 'Veuillez saisir votre email';
-                };
-                if(!validateEmail(value!)){
+                }
+                ;
+                if (!validateEmail(value)) {
                   return "Veuillez saisir un email valide";
                 }
                 return null;
               },
             ),
-            TextFormField(key: _passwordKey, controller: _passwordController,
+            TextFormField(
+              key: _passwordKey,
+              controller: _passwordController,
               decoration: InputDecoration(labelText: "Mot de passe"),
               obscureText: true,
               validator: (value) {
@@ -64,7 +89,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 return null;
               },
             ),
-            TextFormField(key: _confirmPasswordKey, controller: _confirmPasswordController ,
+            TextFormField(
+              key: _confirmPasswordKey,
+              controller: _confirmPasswordController,
               decoration: InputDecoration(labelText: 'Confirmer mot de passe'),
               obscureText: true,
               validator: (value) {
@@ -81,9 +108,13 @@ class _RegisterPageState extends State<RegisterPage> {
             ElevatedButton(
               child: Text('Créer un compte'),
               onPressed: () {
-                if (_emailKey.currentState!.validate() && _passwordKey.currentState!.validate() && _confirmPasswordKey.currentState!.validate()) {
+                if (_emailKey.currentState!.validate() &&
+                    _passwordKey.currentState!.validate() &&
+                    _confirmPasswordKey.currentState!.validate()) {
+                  httpPayload.addAll({'email': _emailController.text});
+                  httpPayload.addAll({'password': _passwordController.text});
                   _controller.nextPage(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.linear);
                 }
               },
@@ -103,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          onSaved: (value) => httpPayload.addAll({'firstname': value!}),
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Nom de famille'),
@@ -113,7 +144,7 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          onSaved: (value) => httpPayload.addAll({'lastname': value!}),
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Niveau'),
@@ -123,7 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          onSaved: (value) => httpPayload.addAll({'level': value}),
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Objectif'),
@@ -133,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          onSaved: (value) => httpPayload.addAll({'objective': value!}),
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Sexe'),
@@ -143,17 +174,27 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          onSaved: (value) => httpPayload.addAll({'sex': value!}),
         ),
         TextFormField(
-          decoration: InputDecoration(labelText: 'Age'),
+          decoration: InputDecoration(
+            labelText: 'Date de naissance',
+            hintText: 'Sélectionnez une date',
+            suffixIcon: Icon(Icons.calendar_today),
+          ),
           validator: (value) {
             if (value!.isEmpty) {
-              return 'Veuillez saisir votre age';
+              return 'Veuillez saisir votre date de naissance';
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          controller: TextEditingController(
+            text: birthDate != null ? DateFormat('yyyy-MM-dd').format(birthDate) : '',
+          ),
+          onTap: () {
+            _selectDate(context);
+          },
+          onSaved: (value) => httpPayload.addAll({'birthDate': value!}),
         ),
         TextFormField(
           decoration: InputDecoration(labelText: 'Ville'),
@@ -163,7 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
             }
             return null;
           },
-          onSaved: (value) => _firstname = value!,
+          onSaved: (value) => httpPayload.addAll({'city': value!}),
         ),
         CheckboxListTile(
           title: Text('Membre d\'une salle de sport ?'),
@@ -176,15 +217,15 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         _isSubscribedToSportsHall
             ? TextFormField(
-                decoration:
-                    InputDecoration(labelText: 'Nom de la salle de sport'),
+                decoration: const InputDecoration(
+                    labelText: 'Nom de la salle de sport'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Veuillez saisir le nom de la salle de sport';
                   }
                   return null;
                 },
-                onSaved: (value) => _sportsHall = value!,
+                onSaved: (value) => httpPayload.addAll({'sportsHall': value!}),
               )
             : Container(),
         ElevatedButton(
@@ -194,11 +235,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 duration: Duration(milliseconds: 300), curve: Curves.linear);
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
-              ;
+              createUser(httpPayload);
             }
           },
         ),
       ]));
+
+  Future<void> createUser(Map<String, dynamic> userObject) async {
+    final headers = {
+      'accept': 'application/ld+json',
+      'Content-Type': 'application/ld+json'
+    };
+    var res = await http.post(Uri.parse('http://192.168.1.150:8000/api/users'),
+        headers: headers, body: json.encode(userObject));
+    if (res.statusCode == 201) {
+      print(res.body);
+      context.go('/login');
+    } else {
+      print('Request failed with status: ${res.statusCode}.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
