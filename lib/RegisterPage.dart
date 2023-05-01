@@ -20,6 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _confirmPasswordController = TextEditingController();
   DateTime birthDate = DateTime.now();
   bool _isSubscribedToSportsHall = false;
+
   Map<String, dynamic> httpPayload = {
     'email': '',
     "password": "",
@@ -38,12 +39,34 @@ class _RegisterPageState extends State<RegisterPage> {
   };
 
   final _controller = PageController(initialPage: 0);
+  late Future<List<dynamic>> sportHallsList = Future(() => []);
+  Object sportsHallObject = {};
+
+  @override
+  void initState() {
+    super.initState();
+    sportHallsList = fetchSportHallsList();
+  }
+
+  Future<List<dynamic>> fetchSportHallsList() async {
+    var res = await http
+        .get(Uri.parse('http://192.168.1.150:8000/api/sports_halls?page=1'));
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception('Failed to fetch data');
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime nowUtc = DateTime.now().toUtc();
-    DateTime eighteenYearsAgo = DateTime.utc(nowUtc.year - 18, nowUtc.month, nowUtc.day);
-    final DateTime? picked =
-        await showDatePicker(context: context, firstDate: DateTime.utc(1940), initialDate: eighteenYearsAgo, lastDate: eighteenYearsAgo);
+    DateTime eighteenYearsAgo =
+        DateTime.utc(nowUtc.year - 18, nowUtc.month, nowUtc.day);
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        firstDate: DateTime.utc(1940),
+        initialDate: eighteenYearsAgo,
+        lastDate: eighteenYearsAgo);
     if (picked != null && picked != birthDate) {
       setState(() {
         birthDate = picked;
@@ -119,6 +142,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 }
               },
             ),
+            ElevatedButton(
+              child: Text('back'),
+              onPressed: () {
+                context.go('/login');
+              },
+            )
           ],
         ),
       );
@@ -189,7 +218,9 @@ class _RegisterPageState extends State<RegisterPage> {
             return null;
           },
           controller: TextEditingController(
-            text: birthDate != null ? DateFormat('yyyy-MM-dd').format(birthDate) : '',
+            text: birthDate != null
+                ? DateFormat('yyyy-MM-dd').format(birthDate)
+                : '',
           ),
           onTap: () {
             _selectDate(context);
@@ -216,16 +247,33 @@ class _RegisterPageState extends State<RegisterPage> {
           },
         ),
         _isSubscribedToSportsHall
-            ? TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Nom de la salle de sport'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Veuillez saisir le nom de la salle de sport';
+            ? FutureBuilder<List<dynamic>>(
+                future: sportHallsList,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final dataList = snapshot.data!;
+                    final dropdownItems = dataList
+                        .map<DropdownMenuItem<String>>(
+                          (item) => DropdownMenuItem<String>(
+                            value: item['@id'],
+                            child: Text(item['name']),
+                          ),
+                        )
+                        .toList();
+                    return DropdownButton(
+                      value: sportsHallObject,
+                      onChanged: (newValue) {
+                        setState(() {
+                          sportsHallObject = newValue as String;
+                        });
+                      },
+                      items: dropdownItems,
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text("${snapshot.error}");
                   }
-                  return null;
+                  return CircularProgressIndicator();
                 },
-                onSaved: (value) => httpPayload.addAll({'sportsHall': value!}),
               )
             : Container(),
         ElevatedButton(
