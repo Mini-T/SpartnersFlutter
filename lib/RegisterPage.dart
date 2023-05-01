@@ -20,7 +20,6 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _confirmPasswordController = TextEditingController();
   DateTime birthDate = DateTime.now();
   bool _isSubscribedToSportsHall = false;
-
   Map<String, dynamic> httpPayload = {
     'email': '',
     "password": "",
@@ -35,24 +34,28 @@ class _RegisterPageState extends State<RegisterPage> {
     "allowLocation": false,
     "premium": false,
     "latitude": null,
-    "longitude": null
+    "longitude": null,
+    "sportsHall": null
   };
 
   final _controller = PageController(initialPage: 0);
-  late Future<List<dynamic>> sportHallsList = Future(() => []);
-  Object sportsHallObject = {};
+  List sportHallsList = [];
+  dynamic sportsHallObject = {};
 
   @override
   void initState() {
     super.initState();
-    sportHallsList = fetchSportHallsList();
+    fetchSportHallsList();
   }
 
-  Future<List<dynamic>> fetchSportHallsList() async {
+  Future<void> fetchSportHallsList() async {
     var res = await http
         .get(Uri.parse('http://192.168.1.150:8000/api/sports_halls?page=1'));
     if (res.statusCode == 200) {
-      return jsonDecode(res.body);
+      dynamic jsonBody = jsonDecode(res.body);
+      setState(() {
+        sportHallsList = jsonBody['hydra:member'];
+      });
     } else {
       throw Exception('Failed to fetch data');
     }
@@ -247,34 +250,22 @@ class _RegisterPageState extends State<RegisterPage> {
           },
         ),
         _isSubscribedToSportsHall
-            ? FutureBuilder<List<dynamic>>(
-                future: sportHallsList,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final dataList = snapshot.data!;
-                    final dropdownItems = dataList
-                        .map<DropdownMenuItem<String>>(
-                          (item) => DropdownMenuItem<String>(
-                            value: item['@id'],
-                            child: Text(item['name']),
-                          ),
-                        )
-                        .toList();
-                    return DropdownButton(
-                      value: sportsHallObject,
-                      onChanged: (newValue) {
-                        setState(() {
-                          sportsHallObject = newValue as String;
-                        });
-                      },
-                      items: dropdownItems,
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-                  return CircularProgressIndicator();
-                },
-              )
+            ? DropdownButton(
+                hint: Text(sportsHallObject['name'] != null
+                    ? sportsHallObject['name']
+                    : 'Sélectionne ta salle de sport'),
+                isExpanded: true,
+                onChanged: (dynamic value) => {
+                      setState(() {
+                        sportsHallObject = value != null ? value : null;
+                      }),
+                      print(value),
+                      this.httpPayload['sportsHall'] = value != null ? value['@id'] : null
+                    },
+                items: sportHallsList.map((sporthall) {
+                  return DropdownMenuItem(
+                      value: sporthall, child: Text(sporthall['name']));
+                }).toList())
             : Container(),
         ElevatedButton(
           child: Text('Continuer'),
