@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:spartners_app/http/HttpQueries.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -45,7 +46,6 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    fetchSportHallsList();
   }
 
   Future<void> fetchSportHallsList() async {
@@ -53,9 +53,9 @@ class _RegisterPageState extends State<RegisterPage> {
         .get(Uri.parse('http://192.168.1.150:8000/api/sports_halls?page=1'));
     if (res.statusCode == 200) {
       dynamic jsonBody = jsonDecode(res.body);
-      setState(() {
+
         sportHallsList = jsonBody['hydra:member'];
-      });
+
     } else {
       throw Exception('Failed to fetch data');
     }
@@ -145,161 +145,161 @@ class _RegisterPageState extends State<RegisterPage> {
                 }
               },
             ),
-            ElevatedButton(
-              child: Text('back'),
-              onPressed: () {
-                context.go('/login');
-              },
+            GestureDetector(
+              onTap: () => context.go('/login'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text("Déjà un compte ?"),
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5),
+                      child: Text(
+                        "Se connecter",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      )),
+                ],
+              ),
             )
           ],
         ),
       );
 
-  Padding formPart2() => Padding(
-      padding: EdgeInsets.all(16.0),
-      child: ListView(children: <Widget>[
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Prénom'),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuillez saisir votre prénom';
-            }
-            return null;
-          },
-          onSaved: (value) => httpPayload.addAll({'firstname': value!}),
-        ),
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Nom de famille'),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuillez saisir votre nom de famille';
-            }
-            return null;
-          },
-          onSaved: (value) => httpPayload.addAll({'lastname': value!}),
-        ),
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Niveau'),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuillez saisir votre email';
-            }
-            return null;
-          },
-          onSaved: (value) => httpPayload.addAll({'level': value}),
-        ),
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Objectif'),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuillez saisir votre email';
-            }
-            return null;
-          },
-          onSaved: (value) => httpPayload.addAll({'objective': value!}),
-        ),
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Sexe'),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuillez saisir votre email';
-            }
-            return null;
-          },
-          onSaved: (value) => httpPayload.addAll({'sex': value!}),
-        ),
-        TextFormField(
-          decoration: InputDecoration(
-            labelText: 'Date de naissance',
-            hintText: 'Sélectionnez une date',
-            suffixIcon: Icon(Icons.calendar_today),
+  Padding formPart2() {
+    fetchSportHallsList();
+    return Padding(
+        padding: EdgeInsets.all(16.0),
+        child: ListView(children: <Widget>[
+          TextFormField(
+            decoration: InputDecoration(labelText: 'Prénom'),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuillez saisir votre prénom';
+              }
+              return null;
+            },
+            onSaved: (value) => httpPayload.addAll({'firstname': value!}),
           ),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuillez saisir votre date de naissance';
-            }
-            return null;
-          },
-          controller: TextEditingController(
-            text: birthDate != null
-                ? DateFormat('yyyy-MM-dd').format(birthDate)
-                : '',
+          TextFormField(
+            decoration: InputDecoration(labelText: 'Nom de famille'),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuillez saisir votre nom de famille';
+              }
+              return null;
+            },
+            onSaved: (value) => httpPayload.addAll({'lastname': value!}),
           ),
-          onTap: () {
-            _selectDate(context);
-          },
-          onSaved: (value) => httpPayload.addAll({'birthDate': value!}),
-        ),
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Ville'),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Veuilez renseigner votre ville';
-            }
-            return null;
-          },
-          onSaved: (value) => httpPayload.addAll({'city': value!}),
-        ),
-        CheckboxListTile(
-          title: Text('Membre d\'une salle de sport ?'),
-          value: _isSubscribedToSportsHall,
-          onChanged: (value) {
-            setState(() {
-              _isSubscribedToSportsHall = value!;
-            });
-          },
-        ),
-        _isSubscribedToSportsHall
-            ? DropdownButton(
-                hint: Text(sportsHallObject['name'] != null
-                    ? sportsHallObject['name']
-                    : 'Sélectionne ta salle de sport'),
-                isExpanded: true,
-                onChanged: (dynamic value) => {
-                      setState(() {
-                        sportsHallObject = value != null ? value : null;
-                      }),
-                      print(value),
-                      this.httpPayload['sportsHall'] = value != null ? value['@id'] : null
-                    },
-                items: sportHallsList.map((sporthall) {
-                  return DropdownMenuItem(
-                      value: sporthall, child: Text(sporthall['name']));
-                }).toList())
-            : Container(),
-        ElevatedButton(
-          child: Text('Continuer'),
-          onPressed: () {
-            _controller.previousPage(
-                duration: Duration(milliseconds: 300), curve: Curves.linear);
-            if (_formKey.currentState!.validate()) {
-              _formKey.currentState!.save();
-              createUser(httpPayload);
-            }
-          },
-        ),
-      ]));
-
-  Future<void> createUser(Map<String, dynamic> userObject) async {
-    final headers = {
-      'accept': 'application/ld+json',
-      'Content-Type': 'application/ld+json'
-    };
-    var res = await http.post(Uri.parse('http://192.168.1.150:8000/api/users'),
-        headers: headers, body: json.encode(userObject));
-    if (res.statusCode == 201) {
-      print(res.body);
-      context.go('/login');
-    } else {
-      print('Request failed with status: ${res.statusCode}.');
-    }
+          TextFormField(
+            decoration: InputDecoration(labelText: 'Niveau'),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuillez saisir votre email';
+              }
+              return null;
+            },
+            onSaved: (value) => httpPayload.addAll({'level': value}),
+          ),
+          TextFormField(
+            decoration: InputDecoration(labelText: 'Objectif'),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuillez saisir votre email';
+              }
+              return null;
+            },
+            onSaved: (value) => httpPayload.addAll({'objective': value!}),
+          ),
+          TextFormField(
+            decoration: InputDecoration(labelText: 'Sexe'),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuillez saisir votre email';
+              }
+              return null;
+            },
+            onSaved: (value) => httpPayload.addAll({'sex': value!}),
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Date de naissance',
+              hintText: 'Sélectionnez une date',
+              suffixIcon: Icon(Icons.calendar_today),
+            ),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuillez saisir votre date de naissance';
+              }
+              return null;
+            },
+            controller: TextEditingController(
+              text: birthDate != null
+                  ? DateFormat('yyyy-MM-dd').format(birthDate)
+                  : '',
+            ),
+            onTap: () {
+              _selectDate(context);
+            },
+            onSaved: (value) => httpPayload.addAll({'birthDate': value!}),
+          ),
+          TextFormField(
+            decoration: InputDecoration(labelText: 'Ville'),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Veuilez renseigner votre ville';
+              }
+              return null;
+            },
+            onSaved: (value) => httpPayload.addAll({'city': value!}),
+          ),
+          CheckboxListTile(
+            title: Text('Membre d\'une salle de sport ?'),
+            value: _isSubscribedToSportsHall,
+            onChanged: (value) {
+              setState(() {
+                _isSubscribedToSportsHall = value!;
+              });
+            },
+          ),
+          _isSubscribedToSportsHall
+              ? DropdownButton(
+                  hint: Text(sportsHallObject['name'] != null
+                      ? sportsHallObject['name']
+                      : 'Sélectionne ta salle de sport'),
+                  isExpanded: true,
+                  onChanged: (dynamic value) => {
+                        setState(() {
+                          sportsHallObject = value != null ? value : null;
+                        }),
+                        this.httpPayload['sportsHall'] =
+                            value != null ? value['@id'] : null
+                      },
+                  items: sportHallsList.map((sporthall) {
+                    return DropdownMenuItem(
+                        value: sporthall, child: Text(sporthall['name']));
+                  }).toList())
+              : Container(),
+          ElevatedButton(
+            child: Text('Continuer'),
+            onPressed: () {
+              _controller.previousPage(
+                  duration: Duration(milliseconds: 300), curve: Curves.linear);
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                HttpQueries.createUser(httpPayload, context);
+              }
+            },
+          ),
+        ]));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Créer un compte'),
+          title: Row(children: [IconButton(onPressed: () => _controller.page == 1.0 ? _controller.previousPage(duration: Duration(milliseconds: 300), curve: Curves.decelerate) : context.pop(), icon: Icon(Icons.arrow_back)),Text('Créer un compte')]) ,
         ),
         body: Form(
             key: _formKey,
