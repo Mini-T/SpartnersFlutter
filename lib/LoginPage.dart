@@ -1,21 +1,23 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:spartners_app/http/HttpQueries.dart';
 
 class LoginPage extends StatefulWidget {
+  final TabController tabController;
+
+  LoginPage({required this.tabController});
+
+
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginPageState createState() => _LoginPageState(tabController: tabController);
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
+  static final _formKey = GlobalKey<FormState>();
   String _email = "";
   String _password = "";
+
+  final TabController tabController;
 
   bool validateEmail(String email) {
     final RegExp regex = RegExp(
@@ -26,20 +28,17 @@ class _LoginPageState extends State<LoginPage> {
 
   Map<String, dynamic> httpPayload = {"email": null, "password": null};
 
-
+  _LoginPageState({required this.tabController});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Connexion'),
-      ),
       body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               Form(
-                key: _formKey,
+                key: _LoginPageState._formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -70,18 +69,19 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       child: const Text('Connexion'),
+
                       onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          HttpQueries.login(httpPayload);
+                        if (_LoginPageState._formKey.currentState!.validate()) {
+                          _LoginPageState._formKey.currentState!.save();
+                          HttpQueries.login(httpPayload, context);
                         }
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
               GestureDetector(
-                onTap: () => context.go('/register'),
+                onTap: () => tabController.animateTo(tabController.index + 1),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:spartners_app/AuthView.dart';
 import 'package:spartners_app/HomePage.dart';
 import 'package:spartners_app/LoginPage.dart';
 import 'package:spartners_app/RegisterPage.dart';
@@ -35,8 +36,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _router = GoRouter(routes: [
     GoRoute(path: '/', builder: (context,state) => HomePage()),
-    GoRoute(path: '/login', builder: (context, state) => LoginPage()),
-    GoRoute(path: '/register', builder: (context, state) => RegisterPage()),
+    GoRoute(path: '/auth', builder: (context, state) => AuthView())
   ]);
 
   @override

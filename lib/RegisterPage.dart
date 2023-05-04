@@ -7,12 +7,18 @@ import 'package:http/http.dart' as http;
 import 'package:spartners_app/http/HttpQueries.dart';
 
 class RegisterPage extends StatefulWidget {
+  final TabController tabController;
+
+  RegisterPage({required this.tabController});
+
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _RegisterPageState createState() =>
+      _RegisterPageState(tabController: tabController);
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final _formKey = GlobalKey<FormState>();
+  final TabController tabController;
+  static final _formKey = GlobalKey<FormState>();
   final _confirmPasswordKey = GlobalKey<FormFieldState>();
   final _emailKey = GlobalKey<FormFieldState>();
   final _passwordKey = GlobalKey<FormFieldState>();
@@ -48,14 +54,14 @@ class _RegisterPageState extends State<RegisterPage> {
     super.initState();
   }
 
+  _RegisterPageState({required this.tabController});
+
   Future<void> fetchSportHallsList() async {
     var res = await http
         .get(Uri.parse('http://192.168.1.150:8000/api/sports_halls?page=1'));
     if (res.statusCode == 200) {
       dynamic jsonBody = jsonDecode(res.body);
-
-        sportHallsList = jsonBody['hydra:member'];
-
+      sportHallsList = jsonBody['hydra:member'];
     } else {
       throw Exception('Failed to fetch data');
     }
@@ -146,7 +152,7 @@ class _RegisterPageState extends State<RegisterPage> {
               },
             ),
             GestureDetector(
-              onTap: () => context.go('/login'),
+              onTap: () => tabController.animateTo(tabController.index - 1),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -172,6 +178,13 @@ class _RegisterPageState extends State<RegisterPage> {
     return Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              _controller.previousPage(
+                  duration: Duration(milliseconds: 300), curve: Curves.linear);
+            },
+          ),
           TextFormField(
             decoration: InputDecoration(labelText: 'Prénom'),
             validator: (value) {
@@ -286,8 +299,8 @@ class _RegisterPageState extends State<RegisterPage> {
             onPressed: () {
               _controller.previousPage(
                   duration: Duration(milliseconds: 300), curve: Curves.linear);
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
+              if (_RegisterPageState._formKey.currentState!.validate()) {
+                _RegisterPageState._formKey.currentState!.save();
                 HttpQueries.createUser(httpPayload, context);
               }
             },
@@ -298,11 +311,8 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Row(children: [IconButton(onPressed: () => _controller.page == 1.0 ? _controller.previousPage(duration: Duration(milliseconds: 300), curve: Curves.decelerate) : context.pop(), icon: Icon(Icons.arrow_back)),Text('Créer un compte')]) ,
-        ),
         body: Form(
-            key: _formKey,
+            key: _RegisterPageState._formKey,
             child: PageView(
               physics: NeverScrollableScrollPhysics(),
               controller: _controller,
