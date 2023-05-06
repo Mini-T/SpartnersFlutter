@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:spartners_app/http/HttpQueries.dart';
+import 'package:spartners_app/services/HttpQueries.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,10 +9,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    await HttpQueries.checkJwt() ? null : context.push('/auth');
+  void waitForWidgetBuild() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      HttpQueries.isAuthenticated
+          ? null
+          : Navigator.pushNamed(context, '/auth');
+    });
   }
 
   @override
@@ -21,7 +23,10 @@ class HomePageState extends State<HomePage> {
         appBar: AppBar(title: Text('LOGO'), actions: [
           Icon(Icons.arrow_circle_right),
           IconButton(
-              onPressed: () async => await HttpQueries.logout(context),
+              onPressed: () => HttpQueries.logout().then(
+                    (value) =>
+                        value ? Navigator.pushNamed(context, '/auth') : null,
+                  ),
               icon: Icon(Icons.logout))
         ]),
         body: Padding(

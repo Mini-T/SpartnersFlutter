@@ -1,21 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:spartners_app/http/HttpQueries.dart';
+import 'package:spartners_app/services/HttpQueries.dart';
 
 class LoginPage extends StatefulWidget {
   final TabController tabController;
 
   LoginPage({required this.tabController});
 
-
   @override
-  _LoginPageState createState() => _LoginPageState(tabController: tabController);
+  _LoginPageState createState() =>
+      _LoginPageState(tabController: tabController);
 }
 
 class _LoginPageState extends State<LoginPage> {
-  static final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(debugLabel: 'loginForm');
   String _email = "";
   String _password = "";
+  late bool invalidCredentials;
 
   final TabController tabController;
 
@@ -31,16 +32,23 @@ class _LoginPageState extends State<LoginPage> {
   _LoginPageState({required this.tabController});
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    invalidCredentials = false;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
+    return Container(
+      color: Colors.white,
+      child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               Form(
-                key: _LoginPageState._formKey,
+                key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Email'),
@@ -56,7 +64,8 @@ class _LoginPageState extends State<LoginPage> {
                       onSaved: (value) => httpPayload['email'] = value!,
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(labelText: 'Mot de passe'),
+                      decoration:
+                          const InputDecoration(labelText: 'Mot de passe'),
                       obscureText: true,
                       validator: (value) {
                         if (value == null) {
@@ -69,14 +78,18 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 16.0),
                     ElevatedButton(
                       child: const Text('Connexion'),
-
                       onPressed: () {
-                        if (_LoginPageState._formKey.currentState!.validate()) {
-                          _LoginPageState._formKey.currentState!.save();
-                          HttpQueries.login(httpPayload, context);
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                          HttpQueries.login(httpPayload).then((value) => value
+                              ? Navigator.pop(context)
+                              : setState(() => {invalidCredentials = true}));
                         }
                       },
-                    )
+                    ),
+                    invalidCredentials
+                        ? Text('Invalid credentials', style: TextStyle(color: Colors.red))
+                        : Container()
                   ],
                 ),
               ),
@@ -86,15 +99,15 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text("Pas de compte ? "),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5),
-                    child: Text(
-                      "Créer un compte",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
-                    )),
+                    Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Text(
+                          "Créer un compte",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                          ),
+                        )),
                   ],
                 ),
               ),
@@ -102,5 +115,4 @@ class _LoginPageState extends State<LoginPage> {
           )),
     );
   }
-
 }

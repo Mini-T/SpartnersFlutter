@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:spartners_app/http/HttpQueries.dart';
+import 'package:spartners_app/services/HttpQueries.dart';
 
 class RegisterPage extends StatefulWidget {
   final TabController tabController;
@@ -18,7 +16,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TabController tabController;
-  static final _formKey = GlobalKey<FormState>();
+  final _registerFormKey = GlobalKey<FormState>(debugLabel: 'registerForm');
   final _confirmPasswordKey = GlobalKey<FormFieldState>();
   final _emailKey = GlobalKey<FormFieldState>();
   final _passwordKey = GlobalKey<FormFieldState>();
@@ -90,7 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return regex.hasMatch(email);
   }
 
-  Padding formPart1() => Padding(
+  Padding formPart1(BuildContext context) => Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
@@ -173,7 +171,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       );
 
-  Padding formPart2() {
+  Padding formPart2(BuildContext context) {
     fetchSportHallsList();
     return Padding(
         padding: EdgeInsets.all(16.0),
@@ -297,11 +295,11 @@ class _RegisterPageState extends State<RegisterPage> {
           ElevatedButton(
             child: Text('Continuer'),
             onPressed: () {
-              _controller.previousPage(
-                  duration: Duration(milliseconds: 300), curve: Curves.linear);
-              if (_RegisterPageState._formKey.currentState!.validate()) {
-                _RegisterPageState._formKey.currentState!.save();
-                HttpQueries.createUser(httpPayload, context);
+              if (_registerFormKey.currentState!.validate()) {
+                _registerFormKey.currentState!.save();
+                HttpQueries.createUser(httpPayload).then((value) => value
+                    ? tabController.animateTo(tabController.index - 1)
+                    : print('could not register'));
               }
             },
           ),
@@ -310,13 +308,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Form(
-            key: _RegisterPageState._formKey,
+    return Container(
+        color: Colors.white,
+        child: Form(
+            key: _registerFormKey,
             child: PageView(
-              physics: NeverScrollableScrollPhysics(),
               controller: _controller,
-              children: [formPart1(), formPart2()],
+              children: [formPart1(context), formPart2(context)],
             )));
   }
 }

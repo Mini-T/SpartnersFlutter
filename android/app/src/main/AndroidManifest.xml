@@ -3,6 +3,7 @@
    <application
         android:label="spartners_app"
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher">
        <meta-data android:name="com.google.android.geo.API_KEY"
            android:value="AIzaSyDHdPb05CsBh2WQI-dP8Irkev6og-jAT78"/>

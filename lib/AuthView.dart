@@ -21,19 +21,24 @@ class AuthViewState extends State<AuthView> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(color: Colors.black, child: ListView(
-          children: [
-            Container(height: MediaQuery.of(context).size.height / 4,),
-            Container(
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.6,
-                margin: EdgeInsets.all(20),
-                child: TabBarView(controller: _controller, children: [
-                  LoginPage(tabController: _controller),
-                  RegisterPage(tabController: _controller)
-                ]))
-          ],
-        )));
+        body: Container(
+            color: Colors.black,
+            child: ListView(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height / 4,
+                ),
+                Container(
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(50)),
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    margin: EdgeInsets.all(20),
+                    child: TabBarView(controller: _controller, children: [
+                      LoginPage(tabController: _controller),
+                      RegisterPage(tabController: _controller)
+                    ]))
+              ],
+            )));
   }
 }

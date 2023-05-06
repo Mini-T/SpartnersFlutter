@@ -1,9 +1,8 @@
+
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:spartners_app/AuthView.dart';
 import 'package:spartners_app/HomePage.dart';
-import 'package:spartners_app/LoginPage.dart';
-import 'package:spartners_app/RegisterPage.dart';
+import 'package:spartners_app/services/HttpQueries.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,31 +18,40 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routes: {
+        '/auth': (context) => AuthView(),
+      },
+      navigatorObservers: [
+        MyNavigatorObserver()
+      ],
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class MyNavigatorObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    route;
+  }
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final _router = GoRouter(routes: [
-    GoRoute(path: '/', builder: (context,state) => HomePage()),
-    GoRoute(path: '/auth', builder: (context, state) => AuthView())
-  ]);
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    newRoute!;
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Spartners',
-      routerConfig: _router,
-    );
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) async {
+    if (await _checkAuthentication()){
+      return null;
+    }
+    print('nope');
+    Navigator.pushNamed(route.navigator!.context, '/auth');
+    return null;
+  }
+
+  Future<bool> _checkAuthentication() async {
+    await HttpQueries.checkJwt();
+    return HttpQueries.isAuthenticated;
   }
 }
