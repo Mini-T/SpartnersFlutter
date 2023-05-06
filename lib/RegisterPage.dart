@@ -15,6 +15,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  bool duplicateEmail = false;
   final TabController tabController;
   final _registerFormKey = GlobalKey<FormState>(debugLabel: 'registerForm');
   final _confirmPasswordKey = GlobalKey<FormFieldState>();
@@ -297,9 +298,19 @@ class _RegisterPageState extends State<RegisterPage> {
             onPressed: () {
               if (_registerFormKey.currentState!.validate()) {
                 _registerFormKey.currentState!.save();
-                HttpQueries.createUser(httpPayload).then((value) => value
-                    ? tabController.animateTo(tabController.index - 1)
-                    : print('could not register'));
+                HttpQueries.createUser(httpPayload).then((value) {
+                  switch(value) {
+                    case 201:
+                      tabController.animateTo(tabController.index - 1);
+                      break;
+                    case 409:
+                      setState(() {
+                        duplicateEmail = true;
+                      });
+                      break;
+                  }
+                }
+                );
               }
             },
           ),

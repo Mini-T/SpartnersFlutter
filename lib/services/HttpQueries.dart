@@ -57,7 +57,7 @@ class HttpQueries {
         .get(Uri.parse('${_apiAddress}/api/chats'), headers: {'Authorization': 'Bearer ${await _storage.read(key: 'jwt')}'});
     print(await res.body);
   }
-  static Future<bool> createUser(
+  static Future<int> createUser(
       Map<String, dynamic> userObject) async {
     final headers = {
       'accept': 'application/ld+json',
@@ -65,10 +65,6 @@ class HttpQueries {
     };
     var res = await http.post(Uri.parse("$_apiAddress/api/users"),
         headers: headers, body: json.encode(userObject));
-    if (res.statusCode == 201) {
-      return true;
-    }
-      print('Request failed with status: ${res.statusCode}. error: ${res.body}');
-    return false;
+  return res.statusCode;
   }
 }
