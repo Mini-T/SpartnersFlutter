@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:spartners_app/services/HttpQueries.dart';
+import 'package:get/get.dart';
+import 'package:spartners_app/services/AuthService.dart';
 
 class LoginPage extends StatefulWidget {
   final TabController tabController;
 
-  LoginPage({required this.tabController});
+  LoginPage({super.key, required this.tabController});
 
   @override
   _LoginPageState createState() =>
@@ -14,8 +15,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>(debugLabel: 'loginForm');
+  AuthService authService = AuthService();
   String _email = "";
   String _password = "";
+
   late bool invalidCredentials;
 
   final TabController tabController;
@@ -81,9 +84,13 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
-                          HttpQueries.login(httpPayload).then((value) => value
-                              ? Navigator.pop(context)
-                              : setState(() => {invalidCredentials = true}));
+                          authService.login(httpPayload).then((value) =>
+                          {
+                                value
+                                    ? Get.offAndToNamed('/')
+                                    : setState(
+                                        () => {invalidCredentials = true})
+                              });
                         }
                       },
                     ),

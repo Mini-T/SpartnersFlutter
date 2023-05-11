@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:spartners_app/services/HttpQueries.dart';
+import 'package:spartners_app/services/AuthService.dart';
 
 class RegisterPage extends StatefulWidget {
   final TabController tabController;
+
 
   RegisterPage({required this.tabController});
 
@@ -15,6 +16,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final AuthService authService = AuthService();
   bool duplicateEmail = false;
   final TabController tabController;
   final _registerFormKey = GlobalKey<FormState>(debugLabel: 'registerForm');
@@ -173,6 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
   Padding formPart2(BuildContext context) {
+    String _selectedLevel = 'Débutant';
     fetchSportHallsList();
     return Padding(
         padding: EdgeInsets.all(16.0),
@@ -204,11 +207,23 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             onSaved: (value) => httpPayload.addAll({'lastname': value!}),
           ),
+          DropdownButton(
+              value: _selectedLevel,
+              autofocus: false,
+              items: [
+                DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
+                DropdownMenuItem(
+                    value: 'Intermédiaire', child: Text('Intermédiaire')),
+                DropdownMenuItem(value: 'Expert', child: Text('Expert'))
+              ],
+              onChanged: (value) => setState(() {
+                    _selectedLevel = value!;
+                  })),
           TextFormField(
             decoration: InputDecoration(labelText: 'Niveau'),
             validator: (value) {
               if (value!.isEmpty) {
-                return 'Veuillez saisir votre email';
+                return 'Veuillez sélectionner votre niveau';
               }
               return null;
             },
@@ -218,7 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
             decoration: InputDecoration(labelText: 'Objectif'),
             validator: (value) {
               if (value!.isEmpty) {
-                return 'Veuillez saisir votre email';
+                return 'Veuillez sélectionner un objectif';
               }
               return null;
             },
@@ -228,7 +243,7 @@ class _RegisterPageState extends State<RegisterPage> {
             decoration: InputDecoration(labelText: 'Sexe'),
             validator: (value) {
               if (value!.isEmpty) {
-                return 'Veuillez saisir votre email';
+                return 'Veuillez sélectionner votre sexe';
               }
               return null;
             },
@@ -298,8 +313,8 @@ class _RegisterPageState extends State<RegisterPage> {
             onPressed: () {
               if (_registerFormKey.currentState!.validate()) {
                 _registerFormKey.currentState!.save();
-                HttpQueries.createUser(httpPayload).then((value) {
-                  switch(value) {
+                authService.createUser(httpPayload).then((value) {
+                  switch (value) {
                     case 201:
                       tabController.animateTo(tabController.index - 1);
                       break;
@@ -309,8 +324,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       });
                       break;
                   }
-                }
-                );
+                });
               }
             },
           ),
