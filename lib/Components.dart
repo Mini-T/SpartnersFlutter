@@ -10,7 +10,7 @@ class Components {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(userDTOField.key),
-            Text(userDTOField.value),
+            ExpansionTile(title: Text(userDTOField.value), children: [TextFormField()]),
           ],
         ),
         Icon(Icons.edit)
