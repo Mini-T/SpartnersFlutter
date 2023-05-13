@@ -16,8 +16,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>(debugLabel: 'loginForm');
   AuthService authService = AuthService();
-  String _email = "";
-  String _password = "";
 
   late bool invalidCredentials;
 

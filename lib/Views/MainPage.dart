@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:spartners_app/Views/MainPages/HomePage.dart';
 import 'package:spartners_app/Views/MainPages/Profile.dart';
 import 'package:spartners_app/services/AuthService.dart';
+import 'package:spartners_app/Views/MainPages/Map.dart';
 
 class MainPage extends StatefulWidget {
 
@@ -12,29 +13,34 @@ class MainPage extends StatefulWidget {
   State<StatefulWidget> createState() => MainPageState();
 }
 
-class MainPageState extends State<MainPage> {
+class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final AuthService authService = AuthService();
-  PageController _controller = PageController();
+  late TabController _controller;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = TabController(length: 5, vsync: this);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('LOGO'), actions: [
-          Icon(Icons.arrow_circle_right),
-          IconButton(
-              onPressed: () => authService.logout().then(
-                    (value) =>
-                        value ? Get.toNamed('/auth') : null,
-                  ),
-              icon: Icon(Icons.logout))
-        ]),
-        body: PageView(
+        body: TabBarView(
           controller: _controller,
           children: [
             HomePage(),
             Profile(),
-            ElevatedButton(onPressed: () async => authService.fetchChats(), child: Text('request !'))
+            Map(),
           ],
-        ));
+        ),
+      bottomNavigationBar: TabBar(controller: _controller, tabs: const [
+        Tab(icon: Icon(Icons.house, color: Colors.grey)),
+        Tab(icon: Icon(Icons.house, color: Colors.grey)),
+        Tab(icon: Icon(Icons.add, color: Colors.grey)),
+        Tab(icon: Icon(Icons.house, color: Colors.grey)),
+        Tab(icon: Icon(Icons.house, color: Colors.grey)),
+      ]) ,
+    );
   }
 }

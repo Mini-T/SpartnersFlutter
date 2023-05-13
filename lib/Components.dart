@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Components {
-  static Widget personalInfo(MapEntry<String, String> userDTOField) {
+  static Widget personalInfo(MapEntry<String, String> userDTOField, final httpPayload,
+      {ValueChanged<String>? onChanged}) {
     return Container(
         child: Row(
       children: [
@@ -10,10 +10,10 @@ class Components {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(userDTOField.key),
-            ExpansionTile(title: Text(userDTOField.value), children: [TextFormField()]),
+            TextFormField(initialValue: null, decoration: InputDecoration(constraints: const BoxConstraints(maxWidth: 200), label: Text(userDTOField.value)), onChanged: onChanged),
           ],
         ),
-        Icon(Icons.edit)
+        const Icon(Icons.edit)
       ],
     ));
   }
