@@ -12,7 +12,7 @@ class AuthService {
     return _singleton;
   }
 
-  static final apiAddress = 'http://192.168.1.150:8000';
+  static final apiAddress = 'http://10.0.2.2:8000';
   final _storage = FlutterSecureStorage();
   static bool isAuthenticated = false;
   AuthService._internal();

@@ -28,23 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _confirmPasswordController = TextEditingController();
   DateTime birthDate = DateTime.now();
   bool _isSubscribedToSportsHall = false;
-  Map<String, dynamic> httpPayload = {
-    'email': '',
-    "password": "",
-    "firstname": "",
-    "lastname": "",
-    "sex": "",
-    "city": "",
-    "age": null,
-    "level": "",
-    "objective": "",
-    "description": "",
-    "allowLocation": false,
-    "premium": false,
-    "latitude": null,
-    "longitude": null,
-    "sportsHall": null
-  };
+  Map<String, dynamic> httpPayload = {};
 
   final _controller = PageController(initialPage: 0);
   List sportHallsList = [];
@@ -59,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> fetchSportHallsList() async {
     var res = await http
-        .get(Uri.parse('http://192.168.1.150:8000/api/sports_halls?page=1'));
+        .get(Uri.parse('http://10.0.2.2:8000/api/sports_halls?page=1'));
     if (res.statusCode == 200) {
       dynamic jsonBody = jsonDecode(res.body);
       sportHallsList = jsonBody['hydra:member'];
@@ -208,27 +192,20 @@ class _RegisterPageState extends State<RegisterPage> {
             onSaved: (value) => httpPayload.addAll({'lastname': value!}),
           ),
           DropdownButton(
+            hint: Text('level'),
               value: _selectedLevel,
-              autofocus: false,
-              items: [
+              items: const [
                 DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
                 DropdownMenuItem(
                     value: 'Intermédiaire', child: Text('Intermédiaire')),
                 DropdownMenuItem(value: 'Expert', child: Text('Expert'))
               ],
               onChanged: (value) => setState(() {
+                print(value);
                     _selectedLevel = value!;
+                    httpPayload.addAll({'level': value});
                   })),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Niveau'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Veuillez sélectionner votre niveau';
-              }
-              return null;
-            },
-            onSaved: (value) => httpPayload.addAll({'level': value}),
-          ),
+
           TextFormField(
             decoration: InputDecoration(labelText: 'Objectif'),
             validator: (value) {
@@ -313,6 +290,7 @@ class _RegisterPageState extends State<RegisterPage> {
             onPressed: () {
               if (_registerFormKey.currentState!.validate()) {
                 _registerFormKey.currentState!.save();
+                print(httpPayload);
                 authService.createUser(httpPayload).then((value) {
                   switch (value) {
                     case 201:
