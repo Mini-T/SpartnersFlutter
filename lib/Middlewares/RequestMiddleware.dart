@@ -15,12 +15,15 @@ class RequestMiddleware extends Interceptor {
   Future onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     String? jwt = await _storage.read(key: 'jwt');
 
-    if (this._isJwtValid(jwt)) {
+    if (jwt == null) {
+      return handler.next(options);
+    }
+    if (_isJwtValid(jwt)) {
       options.headers['Authorization'] = 'Bearer $jwt';
     } else {
-      if(options.path != '/api/logout' && options.path != '/api/token/refresh') {
+      if(options.path != '/api/logout') {
         final res = await refreshLogin(jwt);
-        if(!res && options.path != '/api/login') {
+        if(!res) {
           Get.offAndToNamed('/auth');
           return;
         }
@@ -37,7 +40,6 @@ class RequestMiddleware extends Interceptor {
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       DateTime expirationDate =
       DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000);
-      print(expirationDate);
       bool isExpired = expirationDate.isBefore(DateTime.now());
       return !isExpired;
     }
@@ -45,9 +47,9 @@ class RequestMiddleware extends Interceptor {
   }
 
   Future<bool> refreshLogin(String? currentJwt) async {
+    AuthService.isAuthenticated = false;
     final refToken = await _storage.read(key: 'refreshToken');
     if (refToken != null) {
-      print(jsonEncode({'refresh_token': refToken}));
       final resp = await http.post(Uri.parse('${AuthService.apiAddress}/api/token/refresh'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'refresh_token': refToken}));
       if(resp.statusCode == 200) {
         String jwt = jsonDecode(resp.body)['token'];

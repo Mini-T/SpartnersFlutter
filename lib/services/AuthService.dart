@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spartners_app/Middlewares/RequestMiddleware.dart';
 import 'package:spartners_app/Models/UserDTO.dart';
+import 'package:http/http.dart' as http;
+
 
 class AuthService {
   static final AuthService _singleton = AuthService._internal();
@@ -12,7 +12,7 @@ class AuthService {
     return _singleton;
   }
 
-  static final apiAddress = 'http://10.0.2.2:8000';
+  static final apiAddress = 'http://192.168.1.150:8000';
   final _storage = FlutterSecureStorage();
   static bool isAuthenticated = false;
   AuthService._internal();
@@ -49,15 +49,30 @@ class AuthService {
     return !isAuthenticated;
   }
 
-   Future<bool> refreshLogin() async {
-    final refToken = await _storage.read(key:'refreshToken');
+  Future<List> getSalles() async {
+    final res = await _dio.get('/api/sports_halls');
+    return res.data;
+  }
+
+  Future<List> getUsers() async {
+    final res = await _dio.get('/api/users');
+    return res.data;
+  }
+
+  Future<dynamic> sendLocation(double latitude, double longitude) async {
+    final res = await _dio.patch('/api/changeUserInformation', data: {"latitude": latitude, "longitude": longitude});
+  }
+
+  Future<bool> refreshLogin() async {
+    AuthService.isAuthenticated = false;
+    final refToken = await _storage.read(key: 'refreshToken');
     if (refToken != null) {
-      final resp = await _dio.post('/api/token/refresh', data: jsonEncode({'refresh_token': refToken}));
+      final resp = await http.post(Uri.parse('${AuthService.apiAddress}/api/token/refresh'), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'refresh_token': refToken}));
       if(resp.statusCode == 200) {
-        String jwt = resp.data['token'];
-        String refToken = resp.data['refresh_token'];
-        await _storeTokens(jwt, refToken);
-        isAuthenticated = true;
+        String jwt = jsonDecode(resp.body)['token'];
+        String refToken = jsonDecode(resp.body)['refresh_token'];
+        _storeTokens(jwt, refToken);
+        AuthService.isAuthenticated = true;
         return true;
       };
       await _storage.delete(key: 'refreshToken');
@@ -66,12 +81,13 @@ class AuthService {
     return false;
   }
 
+
   Future<bool> login(Map<String, dynamic> loginData) async {
     try {
-      var res = await _dio.post('/api/login', data: loginData);
+      var res = await http.post(Uri.parse('$apiAddress/api/login'), body: jsonEncode(loginData), headers: {'accept': 'application/json', 'Content-Type': 'application/json'});
       if (res.statusCode == 200) {
-        String token = res.data['token'];
-        String refToken = res.data['refresh_token'];
+        String token = jsonDecode(res.body)['token'];
+        String refToken = jsonDecode(res.body)['refresh_token'];
         await _storeTokens(token, refToken);
         isAuthenticated = true;
         return isAuthenticated;
@@ -80,7 +96,7 @@ class AuthService {
         return false;
       }
     } catch (e) {
-      print(e);
+      print("exception: $e");
       return false;
     }
   }
@@ -89,13 +105,11 @@ class AuthService {
 
   Future<void> fetchChats() async {
     var res = await _dio.get('/api/chats');
-    print(res.data);
   }
 
   Future<int?> createUser(Map<String, dynamic> userObject) async {
     try {
-      var res = await _dio.post('/api/users', data: userObject);
-      print(res.data);
+      var res = await http.post(Uri.parse('$apiAddress/api/users'), headers: {'Content-Type': 'application/json'}, body: jsonEncode(userObject));
       return res.statusCode;
     } catch (e) {
       print(e);

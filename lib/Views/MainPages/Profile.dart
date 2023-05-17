@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:spartners_app/Components.dart';
 import 'package:spartners_app/Models/UserDTO.dart';
 import 'package:spartners_app/services/AuthService.dart';
+import 'package:get/get.dart';
+
 
 class Profile extends StatefulWidget {
   @override
@@ -40,7 +42,7 @@ class ProfileState extends State<Profile> {
                         ? Container()
                         : SizedBox(
                             width: MediaQuery.of(context).size.width,
-                            child: Components.personalInfo(entry, httpPayload, onChanged: (value)
+                            child: Components.personalInfo(entry, httpPayload, onChanged: (dynamic value)
                             {
                               setState(() {
                                 httpPayload[entry.key] = value;
@@ -51,6 +53,7 @@ class ProfileState extends State<Profile> {
                     );
                   }).toList(),
                 ),
+                ElevatedButton(onPressed: () => authService.logout().then((value) => value ? Get.offAndToNamed('/auth') : null), child: Text('Logout'))
               ])),
         ),
         httpPayload.isEmpty ? Container() : Positioned(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Components {
-  static Widget personalInfo(MapEntry<String, String> userDTOField, final httpPayload,
+  static Widget personalInfo(MapEntry<String, dynamic> userDTOField, final httpPayload,
       {ValueChanged<String>? onChanged}) {
     return Container(
         child: Row(
@@ -10,7 +10,7 @@ class Components {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(userDTOField.key),
-            TextFormField(initialValue: null, decoration: InputDecoration(constraints: const BoxConstraints(maxWidth: 200), label: Text(userDTOField.value)), onChanged: onChanged),
+            TextFormField(initialValue: null, decoration: InputDecoration(constraints: const BoxConstraints(maxWidth: 200), label: Text(userDTOField.value ?? '')), onChanged: onChanged),
           ],
         ),
         const Icon(Icons.edit)

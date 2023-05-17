@@ -8,7 +8,7 @@ class UserDTO{
   String city = '';
   String level = '';
   String objective = '';
-  String description = '';
+  String? description = '';
 
   UserDTO(
       {this.firstname = '',
@@ -21,7 +21,7 @@ class UserDTO{
        this.description = ''
       });
 
-  Map<String, String> toMap(){
+  Map<String, dynamic> toMap(){
     return {
       'firstname' : firstname,
       'lastname' : lastname,

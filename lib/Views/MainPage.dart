@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
 import 'package:spartners_app/Views/MainPages/HomePage.dart';
 import 'package:spartners_app/Views/MainPages/Profile.dart';
 import 'package:spartners_app/services/AuthService.dart';
@@ -32,6 +30,8 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
             HomePage(),
             Profile(),
             Map(),
+            Container(),
+            Container()
           ],
         ),
       bottomNavigationBar: TabBar(controller: _controller, tabs: const [

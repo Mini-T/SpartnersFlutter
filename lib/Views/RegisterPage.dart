@@ -33,6 +33,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _controller = PageController(initialPage: 0);
   List sportHallsList = [];
   dynamic sportsHallObject = {};
+  String _selectedLevel = 'Débutant';
+
 
   @override
   void initState() {
@@ -43,10 +45,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> fetchSportHallsList() async {
     var res = await http
-        .get(Uri.parse('http://10.0.2.2:8000/api/sports_halls?page=1'));
+        .get(Uri.parse('http://192.168.1.150:8000/api/choices'));
     if (res.statusCode == 200) {
-      dynamic jsonBody = jsonDecode(res.body);
-      sportHallsList = jsonBody['hydra:member'];
+      sportHallsList = jsonDecode(res.body);
     } else {
       throw Exception('Failed to fetch data');
     }
@@ -159,7 +160,6 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
   Padding formPart2(BuildContext context) {
-    String _selectedLevel = 'Débutant';
     fetchSportHallsList();
     return Padding(
         padding: EdgeInsets.all(16.0),
@@ -192,19 +192,20 @@ class _RegisterPageState extends State<RegisterPage> {
             onSaved: (value) => httpPayload.addAll({'lastname': value!}),
           ),
           DropdownButton(
-            hint: Text('level'),
-              value: _selectedLevel,
-              items: const [
+            hint: Text(_selectedLevel),
+              isExpanded: true,
+              items: [
                 DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
                 DropdownMenuItem(
                     value: 'Intermédiaire', child: Text('Intermédiaire')),
                 DropdownMenuItem(value: 'Expert', child: Text('Expert'))
               ],
-              onChanged: (value) => setState(() {
-                print(value);
-                    _selectedLevel = value!;
-                    httpPayload.addAll({'level': value});
-                  })),
+              onChanged: (value) {
+                setState(() {
+                  _selectedLevel = value!;
+                });
+                httpPayload.addAll({'level': value});
+              }),
 
           TextFormField(
             decoration: InputDecoration(labelText: 'Objectif'),
@@ -269,20 +270,17 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           _isSubscribedToSportsHall
               ? DropdownButton(
-                  hint: Text(sportsHallObject['name'] != null
-                      ? sportsHallObject['name']
-                      : 'Sélectionne ta salle de sport'),
+                  hint: Text(sportsHallObject['nom'] ?? 'Sélectionne ta salle de sport'),
                   isExpanded: true,
                   onChanged: (dynamic value) => {
                         setState(() {
-                          sportsHallObject = value != null ? value : null;
+                          sportsHallObject = value;
                         }),
-                        this.httpPayload['sportsHall'] =
-                            value != null ? value['@id'] : null
+                        httpPayload['sportsHall'] = "/api/sports_halls/${value['id']}"
                       },
                   items: sportHallsList.map((sporthall) {
                     return DropdownMenuItem(
-                        value: sporthall, child: Text(sporthall['name']));
+                        value: sporthall, child: Text(sporthall['nom']));
                   }).toList())
               : Container(),
           ElevatedButton(
@@ -290,7 +288,6 @@ class _RegisterPageState extends State<RegisterPage> {
             onPressed: () {
               if (_registerFormKey.currentState!.validate()) {
                 _registerFormKey.currentState!.save();
-                print(httpPayload);
                 authService.createUser(httpPayload).then((value) {
                   switch (value) {
                     case 201:
