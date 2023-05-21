@@ -6,22 +6,27 @@ import 'package:get/get.dart';
 
 
 class Profile extends StatefulWidget {
+  UserDTO profile;
+
+  Profile({required this.profile});
+
   @override
-  State<StatefulWidget> createState() => ProfileState();
+  State<StatefulWidget> createState() => ProfileState(profile: profile);
 }
 
 class ProfileState extends State<Profile> {
+  UserDTO profile;
+
+
   AuthService authService = AuthService();
-  UserDTO profile = UserDTO();
   final _key = GlobalKey<FormState>();
   Map<String, dynamic> httpPayload = {};
+
+  ProfileState({required this.profile});
 
   @override
   void initState() {
     super.initState();
-    authService
-        .getPersonalInfos()
-        .then((profile) => setState(() => {this.profile = profile}));
   }
 
   @override

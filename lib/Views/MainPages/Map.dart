@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:spartners_app/Views/Dialogs/ProfileDialog.dart';
+import 'package:spartners_app/Views/Dialogs/SalleDialog.dart';
 import 'package:spartners_app/services/AuthService.dart';
+import 'package:getwidget/getwidget.dart';
 
 class Map extends StatefulWidget {
   const Map({super.key});
@@ -21,24 +24,23 @@ class MapState extends State<Map> {
   List listUser = [];
   List markerData = [];
   late Position position;
+  bool loading = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Geolocator.requestPermission().then((value) => {
-          getLocations(),
-          updatePosition(),
-        });
+    refreshInfo();
   }
-
-  void mergeLocations() {
-    print("salles: $listSalle");
-    print("users: $listUser");
-    setState(() {
-      markerData = [...listSalle, ...listUser];
+  Future<void> refreshInfo() async {
+    setState(() => loading = true);
+    Geolocator.requestPermission().then((value) async => {
+      if (value == LocationPermission.whileInUse || value == LocationPermission.always){
+        await updatePosition(),
+      },
+      await getLocations(),
+      setState(()=> loading = false)
     });
-    print(markerData);
   }
 
   Future<void> updatePosition() async {
@@ -81,12 +83,22 @@ class MapState extends State<Map> {
               markers: listSalle.isNotEmpty
                   ? listSalle.map((element) {
                       return Marker(
-                        width: 80,
-                        height: 80,
-                        point:
-                            LatLng(element["latitude"], element["longitude"]),
-                        builder: (context) =>
-                            Icon(Icons.fitness_center, size: 60),
+                        width: 50,
+                        height: 50,
+                        point: LatLng(element["latitude"], element["longitude"]),
+                        builder: (context) => Tooltip(
+                            message: element['name'],
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100)),
+                                child: IconButton(
+                                    onPressed: () => showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              Dialog.fullscreen(child: SalleDialog(salleInfo: element)),
+                                        ),
+                                    icon: const Icon(Icons.fitness_center, size: 35)))),
                       );
                     }).toList()
                   : []),
@@ -96,20 +108,38 @@ class MapState extends State<Map> {
                       if (element['latitude'] != null &&
                           element["longitude"] != null) {
                         return Marker(
-                          width: 80,
-                          height: 80,
+                          width: 50,
+                          height: 50,
                           point:
                               LatLng(element["latitude"], element["longitude"]),
                           builder: (context) =>
-                              Icon(Icons.person_pin_circle, size: 60),
+                              Tooltip(
+                                  message: element['firstname'],
+                                  child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.blue, width: 3, style: BorderStyle.solid),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(100)),
+                                      child: IconButton(
+                                          onPressed: () => showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                Dialog.fullscreen(child: ProfileDialog(userInfo: element)),
+                                          ),
+                                          icon: const Center(child:Icon(Icons.person_2, size: 29)))))
                         );
                       }
-                      return Marker(point: LatLng(0,0), builder: (context) => Container());
-                    }
-                    ).toList()
+                      return Marker(
+                          point: LatLng(0, 0),
+                          builder: (context) => Container());
+                    }).toList()
                   : []),
         ],
       ),
+       Positioned(right: 20, top: 60, child: ElevatedButton(onPressed: () async => refreshInfo(),
+           style: ButtonStyle(shape: MaterialStatePropertyAll(CircleBorder()),backgroundColor: MaterialStatePropertyAll(Colors.white),fixedSize: MaterialStatePropertyAll(Size(60, 60))),
+           child: !loading ? Center(child: Icon(Icons.refresh, color: Colors.blue, size: 30)) : const GFLoader(size:30, type: GFLoaderType.android)
+       ))
     ]);
   }
 }
