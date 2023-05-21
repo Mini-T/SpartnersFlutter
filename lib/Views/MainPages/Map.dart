@@ -9,10 +9,13 @@ import 'package:spartners_app/services/AuthService.dart';
 import 'package:getwidget/getwidget.dart';
 
 class Map extends StatefulWidget {
-  const Map({super.key});
+  List listUser;
+  List listSalle;
+
+  Map({super.key, required this.listUser, required this.listSalle});
 
   @override
-  State<StatefulWidget> createState() => MapState();
+  State<StatefulWidget> createState() => MapState(listUser: listUser, listSalle: listSalle);
 }
 
 class MapState extends State<Map> {
@@ -20,11 +23,13 @@ class MapState extends State<Map> {
   MapController mapController = MapController();
   double zoom = 2;
   late LocationPermission permission;
-  List listSalle = [];
-  List listUser = [];
+  List listSalle;
+  List listUser;
   List markerData = [];
   late Position position;
   bool loading = false;
+
+  MapState({required this.listUser, required this.listSalle});
 
   @override
   void initState() {

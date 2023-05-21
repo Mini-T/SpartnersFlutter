@@ -28,12 +28,13 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController _confirmPasswordController = TextEditingController();
   DateTime birthDate = DateTime.now();
   bool _isSubscribedToSportsHall = false;
-  Map<String, dynamic> httpPayload = {};
+  Map<String, dynamic> httpPayload = {"level": 'Débutant'};
 
   final _controller = PageController(initialPage: 0);
   List sportHallsList = [];
   dynamic sportsHallObject = {};
   String _selectedLevel = 'Débutant';
+  String _selectedObjective = 'Perte de poids';
 
 
   @override
@@ -164,13 +165,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              _controller.previousPage(
-                  duration: Duration(milliseconds: 300), curve: Curves.linear);
-            },
-          ),
           TextFormField(
             decoration: InputDecoration(labelText: 'Prénom'),
             validator: (value) {
@@ -194,7 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
           DropdownButton(
             hint: Text(_selectedLevel),
               isExpanded: true,
-              items: [
+              items: const [
                 DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
                 DropdownMenuItem(
                     value: 'Intermédiaire', child: Text('Intermédiaire')),
@@ -207,16 +201,23 @@ class _RegisterPageState extends State<RegisterPage> {
                 httpPayload.addAll({'level': value});
               }),
 
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Objectif'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Veuillez sélectionner un objectif';
-              }
-              return null;
-            },
-            onSaved: (value) => httpPayload.addAll({'objective': value!}),
-          ),
+          DropdownButton(
+              hint: Text(_selectedObjective ?? "Objectif"),
+              isExpanded: true,
+              items: const [
+                DropdownMenuItem(value: 'Perte de poids', child: Text('Perte de poids')),
+                DropdownMenuItem(
+                    value: 'Prise de masse musculaire', child: Text('Prise de masse musculaire')),
+                DropdownMenuItem(value: 'Renforcement musculaire', child: Text('Renforcement musculaire')),
+                DropdownMenuItem(value: 'Améliorer son endurance', child: Text('Améliorer son endurance')),
+                DropdownMenuItem(value: 'Sèche', child: Text('Sèche'))
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedObjective = value!;
+                });
+                httpPayload.addAll({'objective': value});
+              }),
           TextFormField(
             decoration: InputDecoration(labelText: 'Sexe'),
             validator: (value) {

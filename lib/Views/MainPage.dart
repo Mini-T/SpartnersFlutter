@@ -16,6 +16,16 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final AuthService authService = AuthService();
   late TabController _controller;
   UserDTO profile = UserDTO();
+  List listSalle = [];
+  List listUser = [];
+
+  Future<void> getLocations() async {
+    List userResult = await authService.getUsers();
+    List salleResult = await authService.getSalles();
+    listUser = userResult;
+    listSalle = salleResult;
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -27,6 +37,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
         .then((profile) {
       setState(() => {this.profile = profile});
     });
+    getLocations();
   }
 
   @override
@@ -34,7 +45,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
     return Scaffold(
       body: TabBarView(
         controller: _controller,
-        children: [HomePage(profile: profile), Profile(profile: profile), Map(), Container(), Container()],
+        children: [HomePage(profile: profile), Profile(profile: profile), Map(listUser: listUser, listSalle: listSalle), Container(), Container()],
       ),
       bottomNavigationBar: TabBar(
               padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
