@@ -35,6 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
   dynamic sportsHallObject = {};
   String _selectedLevel = 'Débutant';
   String _selectedObjective = 'Perte de poids';
+  String _selectedSex = 'Non-binaire';
 
 
   @override
@@ -57,7 +58,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _selectDate(BuildContext context) async {
     DateTime nowUtc = DateTime.now().toUtc();
     DateTime eighteenYearsAgo =
-        DateTime.utc(nowUtc.year - 18, nowUtc.month, nowUtc.day);
+        DateTime.utc(nowUtc.year, nowUtc.month, nowUtc.day);
     final DateTime? picked = await showDatePicker(
         context: context,
         firstDate: DateTime.utc(1940),
@@ -218,16 +219,21 @@ class _RegisterPageState extends State<RegisterPage> {
                 });
                 httpPayload.addAll({'objective': value});
               }),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Sexe'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Veuillez sélectionner votre sexe';
-              }
-              return null;
-            },
-            onSaved: (value) => httpPayload.addAll({'sex': value!}),
-          ),
+          DropdownButton(
+              hint: Text(_selectedSex ?? "Sexe"),
+              isExpanded: true,
+              items: const [
+                DropdownMenuItem(value: 'Homme', child: Text('Homme')),
+                DropdownMenuItem(
+                    value: 'Femme', child: Text('Femme')),
+                DropdownMenuItem(value: 'Non-binaire', child: Text('Non-binaire')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedSex = value!;
+                });
+                httpPayload.addAll({'sex': value});
+              }),
           TextFormField(
             decoration: InputDecoration(
               labelText: 'Date de naissance',
