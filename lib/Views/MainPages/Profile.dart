@@ -68,6 +68,9 @@ class ProfileState extends State<Profile> {
                 onPressed: () {
                   if (_key.currentState!.validate()) {
                     _key.currentState!.save();
+                    authService.patchUser(httpPayload).then((value) {
+                      print(value);
+                    });
                   }
                 },
                 child: const Text('Enregistrer')))

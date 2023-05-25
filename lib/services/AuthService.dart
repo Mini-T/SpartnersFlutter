@@ -12,7 +12,7 @@ class AuthService {
     return _singleton;
   }
 
-  static final apiAddress = 'http://192.168.1.150:8000';
+  static final apiAddress = 'https://anne0080.annecy-mdstudent.yt';
   final _storage = FlutterSecureStorage();
   static bool isAuthenticated = false;
   AuthService._internal();
@@ -62,6 +62,10 @@ class AuthService {
   Future<dynamic> sendLocation(double latitude, double longitude) async {
     final res = await _dio.patch('/api/changeUserInformation', data: {"latitude": latitude, "longitude": longitude});
   }
+  Future<dynamic> patchUser(Map<String, dynamic> payload) async {
+    final res = await _dio.patch('/api/changeUserInformation', data: payload);
+    return res.statusCode;
+  }
 
   Future<bool> refreshLogin() async {
     AuthService.isAuthenticated = false;
@@ -110,6 +114,7 @@ class AuthService {
   Future<int?> createUser(Map<String, dynamic> userObject) async {
     try {
       var res = await http.post(Uri.parse('$apiAddress/api/users'), headers: {'Content-Type': 'application/json'}, body: jsonEncode(userObject));
+      print(res);
       return res.statusCode;
     } catch (e) {
       print(e);

@@ -48,6 +48,7 @@ dependencies:
   latlong2: ^0.8.1
   geolocator: ^9.0.2
   getwidget: ^3.1.1
+  flutter_svg: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +75,54 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/Assets/images/img.png
+  fonts:
+    - family: DrukTrial
+      fonts:
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-Bold-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-BoldItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-Heavy-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-HeavyItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-Medium-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-MediumItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/Druk-SuperItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-Bold-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-BoldItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-Heavy-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-HeavyItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-Medium-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-MediumItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukCond-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukCond-SuperItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukText-SuperItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-Bold-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-BoldItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-Heavy-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-HeavyItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-Medium-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-MediumItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukTextWide-SuperItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-Bold-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-BoldItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-Heavy-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-HeavyItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-Medium-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-MediumItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukWide-SuperItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukXCond-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukXCond-SuperItalic-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukXXCond-Super-Trial.otf
+        - asset: ./lib/Assets/fonts/DrukTrial/DrukXXCond-SuperItalic-Trial.otf
+    - family: Eras
+      fonts:
+        - asset: ./lib/Assets/fonts/Eras/eras-bold-5871820c913a2.otf
+        - asset: ./lib/Assets/fonts/Eras/eras-bold-5871825645ec8.otf
+        - asset: ./lib/Assets/fonts/Eras/eras-book-587181c4d21d4.otf
+        - asset: ./lib/Assets/fonts/Eras/eras-demi-587182767b329.otf
+        - asset: ./lib/Assets/fonts/Eras/eras-light-5871822a2e706.otf
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

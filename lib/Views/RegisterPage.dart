@@ -47,7 +47,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> fetchSportHallsList() async {
     var res = await http
-        .get(Uri.parse('http://192.168.1.150:8000/api/choices'));
+        .get(Uri.parse('https://anne0080.annecy-mdstudent.yt/api/choices'));
+    print(res.body);
     if (res.statusCode == 200) {
       sportHallsList = jsonDecode(res.body);
     } else {
@@ -298,6 +299,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 authService.createUser(httpPayload).then((value) {
                   switch (value) {
                     case 201:
+                      tabController.animateTo(tabController.index - 1);
+                      break;
+                    case 200:
                       tabController.animateTo(tabController.index - 1);
                       break;
                     case 409:
