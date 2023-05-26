@@ -17,6 +17,20 @@ class HomePageState extends State<HomePage> {
 
   HomePageState({required this.profile});
 
+  @override
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print(profile.firstname);
+    setState(() {});
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {});
+  }
+
   Widget imgText(String heading, String quantity, String mesure) {
     return Container(
         padding: EdgeInsets.all(20),

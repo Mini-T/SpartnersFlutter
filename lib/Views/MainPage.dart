@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,11 +15,18 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> with TickerProviderStateMixin {
+  late Timer _timer;
   final AuthService authService = AuthService();
   late TabController _controller;
   UserDTO profile = UserDTO();
   List listSalle = [];
   List listUser = [];
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer.cancel();
+  }
 
   Future<void> getLocations() async {
     List userResult = await authService.getUsers();
@@ -32,8 +41,16 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
     // TODO: implement initState
     super.initState();
     _controller = TabController(length: 5, vsync: this);
+    _controller.addListener(() { setState(() {print(_controller.index);}); });
     authService.getPersonalInfos().then((profile) {
       setState(() => {this.profile = profile});
+    });
+    _timer = Timer.periodic(Duration(seconds: 10), (timer) {
+      authService.getPersonalInfos().then((profile) {
+        print('main : $profile');
+        setState(() => {this.profile = profile});
+      });
+
     });
     getLocations();
   }
@@ -45,30 +62,35 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
         controller: _controller,
         children: [
           HomePage(profile: profile),
-          Profile(profile: profile),
           Map(listUser: listUser, listSalle: listSalle),
           Container(),
-          Container()
+          Container(),
+          Profile(profile: profile),
         ],
       ),
       bottomNavigationBar: TabBar(
           padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
           controller: _controller,
-          onTap: (i) => setState(() {}),
           tabs: [
             Tab(
-                icon: SvgPicture.string(color: _controller.index != 0 ? Color(0xFFD6D6D6) : Color(0xFFFBBA00),
+                icon: SvgPicture.string(
+                    color: _controller.index != 0 ? Color(0xFFD6D6D6) : Color(
+                        0xFFFBBA00),
                     '''<svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M12.058 17.6336H14.374C14.4964 17.6333 14.6138 17.5849 14.7008 17.4989C14.7878 17.4128 14.8374 17.2959 14.839 17.1736V9.28258C14.8066 8.6959 14.5744 8.13799 14.181 7.70157L8.68102 2.20157C8.63756 2.15809 8.58596 2.1236 8.52916 2.10007C8.47237 2.07654 8.41149 2.06443 8.35002 2.06443C8.28854 2.06443 8.22767 2.07654 8.17087 2.10007C8.11408 2.1236 8.06248 2.15809 8.01902 2.20157L2.51902 7.70157C2.12588 8.13816 1.89372 8.69598 1.86102 9.28258V17.6296C1.85002 17.8836 11.8 17.6336 12.058 17.6336ZM1.85002 19.4886C1.60635 19.4884 1.3651 19.4402 1.14012 19.3466C0.915142 19.253 0.710853 19.116 0.538973 18.9433C0.367093 18.7705 0.231005 18.5656 0.138517 18.3401C0.0460302 18.1147 -0.00103587 17.8732 1.7291e-05 17.6296V9.45057C0.0617795 8.27414 0.52524 7.15449 1.31302 6.27857L7.03302 0.558575C7.2054 0.385896 7.41015 0.248905 7.63553 0.155436C7.86092 0.0619664 8.10252 0.013855 8.34652 0.013855C8.59052 0.013855 8.83212 0.0619664 9.0575 0.155436C9.28289 0.248905 9.48763 0.385896 9.66002 0.558575L15.38 6.27857C16.1684 7.15409 16.632 8.27397 16.693 9.45057V17.6296C16.6937 17.8731 16.6463 18.1144 16.5537 18.3397C16.4611 18.5649 16.325 18.7697 16.1532 18.9424C15.9814 19.115 15.7772 19.2521 15.5524 19.3458C15.3276 19.4395 15.0866 19.4881 14.843 19.4886H1.85002Z" fill="#FBBA00"/>
 </svg>
 ''')),
-            Tab(icon: SvgPicture.string(color: _controller.index != 1 ? Color(0xFFD6D6D6) : Color(0xFFFBBA00),
+            Tab(icon: SvgPicture.string(
+                color: _controller.index != 1 ? Color(0xFFD6D6D6) : Color(
+                    0xFFFBBA00),
                 '''<svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M17.9426 0.130384L1.81065 7.57538C1.4181 7.74972 1.09704 8.05315 0.900836 8.43524C0.704632 8.81733 0.645104 9.25505 0.732146 9.67566C0.819189 10.0963 1.04756 10.4744 1.37929 10.7473C1.71103 11.0201 2.12615 11.1712 2.55565 11.1754H9.38065V18.0004C9.38486 18.4299 9.53595 18.845 9.80878 19.1767C10.0816 19.5085 10.4598 19.7368 10.8804 19.8239C11.301 19.9109 11.7387 19.8514 12.1208 19.6552C12.5029 19.459 12.8063 19.1379 12.9806 18.7454L20.4236 2.61138C20.5495 2.26514 20.574 1.89017 20.4942 1.53051C20.4144 1.17084 20.2336 0.841405 19.9731 0.580897C19.7126 0.320388 19.3832 0.139619 19.0235 0.059818C18.6639 -0.0199831 18.2889 0.00449722 17.9426 0.130384Z" fill="#D6D6D6"/>
 </svg>
 
 ''')),
-            Tab(icon: SvgPicture.string(color: _controller.index != 2 ? Color(0xFFD6D6D6) : Color(0xFFFBBA00),
+            Tab(icon: SvgPicture.string(
+                color: _controller.index != 2 ? Color(0xFFD6D6D6) : Color(
+                    0xFFFBBA00),
                 '''<svg width="30" height="28" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M26.7703 7.61004C26.81 7.85034 26.8546 8.09674 26.5822 8.23598C26.376 8.34091 26.1127 8.23872 25.9094 7.95289C25.2755 7.06135 24.6515 6.16215 24.0253 5.26444C23.9864 5.20881 23.9597 5.14454 23.9323 5.08248C23.8408 4.87769 23.8388 4.67626 24.0106 4.5189C24.1713 4.37179 24.3553 4.41201 24.5319 4.51132C24.5688 4.53213 24.6059 4.55203 24.6434 4.57247L26.7703 7.61004Z" fill="#D6D6D6"/>
 <path d="M18.5649 9.38091C18.4889 9.27235 18.4257 9.18215 18.3626 9.09195C17.5696 7.9504 16.7577 6.82053 15.9893 5.66263C15.4742 4.88594 15.7388 3.87967 16.5098 3.47342C17.0833 3.17084 17.9253 3.37491 18.3863 3.92947C18.4737 4.03489 18.5571 4.14477 18.6357 4.25711C20.7628 7.29377 22.8881 10.3325 25.0185 13.3669C25.3142 13.7892 25.5041 14.235 25.4446 14.7572C25.3149 15.892 24.0693 16.3907 23.1165 15.6782C22.9019 15.5178 22.7184 15.3002 22.5612 15.0802C21.8139 14.0323 21.0801 12.9741 20.3415 11.9193C20.2882 11.8431 20.2348 11.7669 20.1724 11.6778L11.218 17.9478C11.2721 18.025 11.3243 18.0995 11.3761 18.1735C12.1246 19.2424 12.8731 20.3104 13.621 21.3796C13.8453 21.6999 14.0175 22.0462 14.0337 22.4437C14.0588 23.066 13.8441 23.573 13.2648 23.8571C12.7035 24.1326 12.1636 24.0188 11.6777 23.658C11.4893 23.5178 11.3229 23.3317 11.1866 23.1381C9.02522 20.0627 6.87094 16.9815 4.71274 13.9039C4.42607 13.4945 4.26882 13.0508 4.3356 12.5517C4.48815 11.4105 5.77349 10.9355 6.70421 11.6828C6.90128 11.841 7.07508 12.0413 7.22267 12.2486C7.96893 13.2973 8.70324 14.3551 9.44185 15.41C9.49517 15.4861 9.54812 15.5617 9.61127 15.6519L18.5662 9.38162L18.5649 9.38091Z" fill="#D6D6D6"/>
@@ -78,12 +100,16 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
 </svg>
 
 ''')),
-            Tab(icon: SvgPicture.string(color: _controller.index != 3 ? Color(0xFFD6D6D6) : Color(0xFFFBBA00),
+            Tab(icon: SvgPicture.string(
+                color: _controller.index != 3 ? Color(0xFFD6D6D6) : Color(
+                    0xFFFBBA00),
                 '''<svg width="23" height="20" viewBox="0 0 23 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M21.511 17.5159C21.5109 17.9348 21.6269 18.3455 21.8461 18.7024C22.0654 19.0594 22.3793 19.3486 22.753 19.5379V19.8469C22.0256 19.9467 21.2849 19.8718 20.5922 19.6283C19.8996 19.3848 19.2749 18.9798 18.77 18.4469C18.2457 18.5861 17.7054 18.6563 17.163 18.6559C14.076 18.6559 11.573 16.4309 11.573 13.6869C11.573 10.9429 14.073 8.71786 17.163 8.71786C20.253 8.71786 22.753 10.9429 22.753 13.6869C22.7481 14.7376 22.3823 15.7547 21.717 16.5679C21.5804 16.8642 21.5098 17.1866 21.51 17.5129L21.511 17.5159ZM10.331 0.0258551C15.731 0.0258551 20.131 3.53085 20.265 7.89585C19.2887 7.46399 18.2325 7.24219 17.165 7.24486C15.3526 7.22964 13.5976 7.8801 12.233 9.07285C11.5681 9.64498 11.0337 10.3531 10.6659 11.1494C10.2981 11.9457 10.1055 12.8117 10.101 13.6889C10.1 14.5446 10.2835 15.3904 10.639 16.1689C10.539 16.1689 10.439 16.1689 10.334 16.1689C9.81605 16.1682 9.29868 16.1348 8.78497 16.0689C6.65097 18.2029 4.10297 18.5859 1.63897 18.6419V18.1199C2.30317 17.8601 2.88473 17.4256 3.32203 16.8622C3.75934 16.2989 4.03609 15.6277 4.12297 14.9199C4.12285 14.7334 4.10881 14.5472 4.08097 14.3629C2.99111 13.7085 2.08279 12.7912 1.43919 11.6949C0.795579 10.5986 0.43724 9.35845 0.396973 8.08785C0.396973 3.62885 4.84597 0.013855 10.334 0.013855L10.331 0.0258551Z" fill="#D6D6D6"/>
 </svg>
 ''')),
-            Tab(icon: Icon(color: _controller.index != 4 ? Color(0xFFD6D6D6) : Color(0xFFFBBA00),
+            Tab(icon: Icon(
+              color: _controller.index != 4 ? Color(0xFFD6D6D6) : Color(
+                  0xFFFBBA00),
               Icons.person,
               size: 38,
             )),

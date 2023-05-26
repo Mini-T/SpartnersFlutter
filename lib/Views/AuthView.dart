@@ -1,15 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spartners_app/Views/LoginPage.dart';
 import 'package:get/get.dart';
 import '../services/AuthService.dart';
 import 'RegisterPage.dart';
 
 class AuthView extends StatefulWidget {
-
-
-  AuthView();
 
   @override
   State<StatefulWidget> createState() => AuthViewState();
