@@ -60,6 +60,8 @@ class AuthService {
     return res.data;
   }
 
+
+
   Future<dynamic> sendLocation(double latitude, double longitude) async {
     final res = await _dio.patch('/api/changeUserInformation', data: {"latitude": latitude, "longitude": longitude});
   }

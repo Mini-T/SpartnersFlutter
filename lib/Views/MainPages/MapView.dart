@@ -1,6 +1,8 @@
-import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
+import 'dart:core';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:core';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -9,29 +11,29 @@ import 'package:spartners_app/Views/Dialogs/SalleDialog.dart';
 import 'package:spartners_app/services/AuthService.dart';
 import 'package:getwidget/getwidget.dart';
 
-class Map extends StatefulWidget {
+class MapView extends StatefulWidget {
   List listUser;
   List listSalle;
 
-  Map({super.key, required this.listUser, required this.listSalle});
+  MapView({super.key, required this.listUser, required this.listSalle});
 
   @override
   State<StatefulWidget> createState() =>
-      MapState(listUser: listUser, listSalle: listSalle);
+      MapViewState(listUser: listUser, listSalle: listSalle);
 }
 
-class MapState extends State<Map> {
+class MapViewState extends State<MapView> {
   AuthService authService = AuthService();
   MapController mapController = MapController();
   double zoom = 2;
   late LocationPermission permission;
-  List listSalle;
-  List listUser;
+  late List listSalle;
+  late List listUser;
   List markerData = [];
   late Position position;
   bool loading = false;
 
-  MapState({required this.listUser, required this.listSalle});
+  MapViewState({required this.listUser, required this.listSalle});
 
   @override
   void initState() {
@@ -61,7 +63,7 @@ class MapState extends State<Map> {
   }
 
   Future<void> getLocations() async {
-    List userResult = await authService.getUsers();
+    List userResult = await authService.getUsers() ;
     List salleResult = await authService.getSalles();
     listUser = userResult;
     listSalle = salleResult;
@@ -105,7 +107,7 @@ class MapState extends State<Map> {
                                   borderRadius: BorderRadius.circular(100)),
                               child: IconButton(
                                   onPressed: () {
-                                    showModalBottomSheet(isDismissible: true, isScrollControlled: true,enableDrag: true,context: context,
+                                    showModalBottomSheet(isScrollControlled: true,context: context,
                                       builder: (context) =>
                                           SalleDialog(salleInfo: element)
                                       ,);

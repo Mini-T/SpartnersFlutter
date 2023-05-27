@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:spartners_app/Middlewares/AuthMiddleware.dart';
 import 'package:spartners_app/Views/AuthView.dart';
@@ -7,6 +8,9 @@ import 'package:spartners_app/Views/MainPage.dart';
 import 'package:spartners_app/services/AuthService.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 

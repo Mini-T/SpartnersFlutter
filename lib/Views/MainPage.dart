@@ -7,7 +7,7 @@ import 'package:spartners_app/Models/UserDTO.dart';
 import 'package:spartners_app/Views/MainPages/HomePage.dart';
 import 'package:spartners_app/Views/MainPages/Profile.dart';
 import 'package:spartners_app/services/AuthService.dart';
-import 'package:spartners_app/Views/MainPages/Map.dart';
+import 'package:spartners_app/Views/MainPages/MapView.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -29,8 +29,8 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   }
 
   Future<void> getLocations() async {
-    List userResult = await authService.getUsers();
-    List salleResult = await authService.getSalles();
+    List userResult = await authService.getUsers() as List<Map<String, dynamic>> ;
+    List salleResult = await authService.getSalles() as List<Map<String, dynamic>> ;
     listUser = userResult;
     listSalle = salleResult;
     setState(() {});
@@ -61,7 +61,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
         controller: _controller,
         children: [
           HomePage(profile: profile),
-          Map(listUser: listUser, listSalle: listSalle),
+          MapView(listUser: listUser, listSalle: listSalle),
           Container(),
           Container(),
           Profile(profile: profile),
@@ -70,6 +70,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
       bottomNavigationBar: TabBar(
           padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
           controller: _controller,
+          indicatorColor: Colors.transparent,
           tabs: [
             Tab(
                 icon: SvgPicture.string(
