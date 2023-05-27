@@ -51,6 +51,7 @@ class AuthService {
 
   Future<List> getSalles() async {
     final res = await _dio.get('/api/sports_halls');
+    print(res);
     return res.data;
   }
 

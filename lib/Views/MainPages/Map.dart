@@ -1,3 +1,4 @@
+import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -15,7 +16,8 @@ class Map extends StatefulWidget {
   Map({super.key, required this.listUser, required this.listSalle});
 
   @override
-  State<StatefulWidget> createState() => MapState(listUser: listUser, listSalle: listSalle);
+  State<StatefulWidget> createState() =>
+      MapState(listUser: listUser, listSalle: listSalle);
 }
 
 class MapState extends State<Map> {
@@ -37,14 +39,17 @@ class MapState extends State<Map> {
     super.initState();
     refreshInfo();
   }
+
   Future<void> refreshInfo() async {
     setState(() => loading = true);
-    Geolocator.requestPermission().then((value) async => {
-      if (value == LocationPermission.whileInUse || value == LocationPermission.always){
+    Geolocator.requestPermission().then((value) async =>
+    {
+      if (value == LocationPermission.whileInUse ||
+          value == LocationPermission.always){
         await updatePosition(),
       },
       await getLocations(),
-      setState(()=> loading = false)
+      setState(() => loading = false)
     });
   }
 
@@ -87,64 +92,82 @@ class MapState extends State<Map> {
           MarkerLayer(
               markers: listSalle.isNotEmpty
                   ? listSalle.map((element) {
-                      return Marker(
-                        width: 50,
-                        height: 50,
-                        point: LatLng(element["latitude"], element["longitude"]),
-                        builder: (context) => Tooltip(
-                            message: element['name'],
-                            child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(100)),
-                                child: IconButton(
-                                    onPressed: () => showDialog(
-                                          context: context,
-                                          builder: (context) =>
-                                              Dialog.fullscreen(child: SalleDialog(salleInfo: element)),
-                                        ),
-                                    icon: const Icon(Icons.fitness_center, size: 35)))),
-                      );
-                    }).toList()
+                return Marker(
+                  width: 50,
+                  height: 50,
+                  point: LatLng(element["latitude"], element["longitude"]),
+                  builder: (context) =>
+                      Tooltip(
+                          message: element['name'],
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(100)),
+                              child: IconButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(isDismissible: true, isScrollControlled: true,enableDrag: true,context: context,
+                                      builder: (context) =>
+                                          SalleDialog(salleInfo: element)
+                                      ,);
+                                  }
+                                  ,
+                                  icon: const Icon(
+                                      Icons.fitness_center, size: 35)))),
+                );
+              }).toList()
                   : []),
           MarkerLayer(
               markers: listUser.isNotEmpty
                   ? listUser.map((element) {
-                      if (element['latitude'] != null &&
-                          element["longitude"] != null) {
-                        return Marker(
-                          width: 50,
-                          height: 50,
-                          point:
-                              LatLng(element["latitude"], element["longitude"]),
-                          builder: (context) =>
-                              Tooltip(
-                                  message: element['firstname'],
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.blue, width: 3, style: BorderStyle.solid),
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(100)),
-                                      child: IconButton(
-                                          onPressed: () => showDialog(
+                if (element['latitude'] != null &&
+                    element["longitude"] != null) {
+                  return Marker(
+                      width: 50,
+                      height: 50,
+                      point:
+                      LatLng(element["latitude"], element["longitude"]),
+                      builder: (context) =>
+                          Tooltip(
+                              message: element['firstname'],
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.blue,
+                                          width: 3,
+                                          style: BorderStyle.solid),
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(100)),
+                                  child: IconButton(
+                                      onPressed: () =>
+                                          showDialog(
                                             context: context,
                                             builder: (context) =>
-                                                Dialog.fullscreen(child: ProfileDialog(userInfo: element)),
+                                                Dialog.fullscreen(
+                                                    child: ProfileDialog(
+                                                        userInfo: element)),
                                           ),
-                                          icon: const Center(child:Icon(Icons.person_2, size: 29)))))
-                        );
-                      }
-                      return Marker(
-                          point: LatLng(0, 0),
-                          builder: (context) => Container());
-                    }).toList()
+                                      icon: const Center(child: Icon(
+                                          Icons.person_2, size: 29)))))
+                  );
+                }
+                return Marker(
+                    point: LatLng(0, 0),
+                    builder: (context) => Container());
+              }).toList()
                   : []),
         ],
       ),
-       Positioned(right: 20, top: 60, child: ElevatedButton(onPressed: () async => refreshInfo(),
-           style: ButtonStyle(shape: MaterialStatePropertyAll(CircleBorder()),backgroundColor: MaterialStatePropertyAll(Colors.white),fixedSize: MaterialStatePropertyAll(Size(60, 60))),
-           child: !loading ? Center(child: Icon(Icons.refresh, color: Colors.blue, size: 30)) : const GFLoader(size:30, type: GFLoaderType.android)
-       ))
+      Positioned(right: 20,
+          top: 60,
+          child: ElevatedButton(onPressed: () async => refreshInfo(),
+              style: ButtonStyle(
+                  shape: MaterialStatePropertyAll(CircleBorder()),
+                  backgroundColor: MaterialStatePropertyAll(Colors.white),
+                  fixedSize: MaterialStatePropertyAll(Size(60, 60))),
+              child: !loading
+                  ? Center(
+                  child: Icon(Icons.refresh, color: Colors.blue, size: 30))
+                  : const GFLoader(size: 30, type: GFLoaderType.android)
+          ))
     ]);
   }
 }

@@ -41,13 +41,12 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
     // TODO: implement initState
     super.initState();
     _controller = TabController(length: 5, vsync: this);
-    _controller.addListener(() { setState(() {print(_controller.index);}); });
+    _controller.addListener(() {setState(() {});});
     authService.getPersonalInfos().then((profile) {
       setState(() => {this.profile = profile});
     });
-    _timer = Timer.periodic(Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
       authService.getPersonalInfos().then((profile) {
-        print('main : $profile');
         setState(() => {this.profile = profile});
       });
 

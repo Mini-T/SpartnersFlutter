@@ -47,6 +47,7 @@ dependencies:
   geolocator: ^9.0.2
   getwidget: ^3.1.1
   flutter_svg: ^2.0.5
+  draggable_bottom_sheet: ^1.0.2
 
 dev_dependencies:
   flutter_test:
@@ -72,7 +73,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/Assets/images/img.png
+    - lib/Assets/images/running_guy.png
+    - lib/Assets/images/spotify.png
+    - lib/Assets/images/tapis.png
+    - lib/Assets/images/squat.png
+    - lib/Assets/images/crossfit.png
   fonts:
     - family: DrukTrial
       fonts:
@@ -121,6 +126,9 @@ flutter:
         - asset: ./lib/Assets/fonts/Eras/eras-book-587181c4d21d4.otf
         - asset: ./lib/Assets/fonts/Eras/eras-demi-587182767b329.otf
         - asset: ./lib/Assets/fonts/Eras/eras-light-5871822a2e706.otf
+    - family: CircularStd
+      fonts:
+        - asset: ./lib/Assets/fonts/CircularStd/circular-std-medium-500.ttf
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

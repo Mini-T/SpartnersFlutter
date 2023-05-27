@@ -11,7 +11,7 @@ class SalleDialog extends StatelessWidget {
     return Container(
         padding: EdgeInsets.all(10),
         color: Colors.white,
-        child: ListView(
+        child: Column(
           children: [
             Center(
                 child: Container(
