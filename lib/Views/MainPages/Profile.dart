@@ -98,8 +98,8 @@ class ProfileState extends State<Profile> {
                                   size: GFSize.LARGE,
                                   shape: GFButtonShape.pills,
                                   onPressed: () => null,
-                                  color: Color(0xFFFBBA00),
-                                  textStyle: TextStyle(
+                                  color: const Color(0xFFFBBA00),
+                                  textStyle: const TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'CircularStd',
                                       fontSize: 13,
@@ -108,6 +108,7 @@ class ProfileState extends State<Profile> {
                         ],
                       ))
                 ]),
+                Container(padding: const EdgeInsets.all(15), child:Text('À propos', style: TextStyle(fontFamily: 'Eras', fontSize: 20, fontWeight: FontWeight.w400))),
                 Components.customExpansionTile(Components.descFormField(
                     initialValue: profile.description, 'Bio', (value) {
                   if (value == profile.description) {
@@ -184,8 +185,8 @@ class ProfileState extends State<Profile> {
                     return;
                   }
                   httpPayload.addAll({'city': value!});
-                }), profile.city, 'Ville'),
-                profile.sportsHall != null ? Components.customExpansionTile(Components.dropDownButton(listSalle.map((hall) {
+                }, initialValue: profile.city), profile.city, 'Ville'),
+                 Components.customExpansionTile(Components.dropDownButton(listSalle.map((hall) {
                   return DropdownMenuItem(
                   value: hall, child: Text(hall['name']));
                 }).cast<DropdownMenuItem>().toList(), _selectedSportsHall['name'], (dynamic value) => {
@@ -194,7 +195,7 @@ class ProfileState extends State<Profile> {
                     _selectedSportsHall = value;
                   }),
                   httpPayload['sportsHall'] = value['id']
-                }, "Salle de sport"), listSalle.firstWhereOrNull((element) => element['id'] == profile.sportsHall)['name'], "Salle de sport") : Container(),
+                }, "Salle de sport"), listSalle.firstWhereOrNull((element) => element['id'] == profile.sportsHall)['name'], "Salle de sport"),
                 ElevatedButton(
                     onPressed: () => authService.logout().then(
                         (value) => value ? Get.offAndToNamed('/auth') : null),
