@@ -19,15 +19,10 @@ class HomePageState extends State<HomePage> {
   HomePageState({required this.profile});
 
   @override
-  void didUpdateWidget(HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    setState(() {});
-  }
-
-  @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    print(profile.firstname);
     setState(() {});
   }
 

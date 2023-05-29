@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:spartners_app/Components.dart';
 import 'package:spartners_app/services/AuthService.dart';
 
 class RegisterPage extends StatefulWidget {
   final TabController tabController;
-
 
   RegisterPage({required this.tabController});
 
@@ -33,10 +33,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final _controller = PageController(initialPage: 0);
   List sportHallsList = [];
   dynamic sportsHallObject = {};
-  String _selectedLevel = 'Débutant';
-  String _selectedObjective = 'Perte de poids';
-  String _selectedSex = 'Non-binaire';
-
+  String _selectedLevel = '';
+  String _selectedObjective = '';
+  String _selectedSex = '';
 
   @override
   void initState() {
@@ -167,74 +166,57 @@ class _RegisterPageState extends State<RegisterPage> {
     return Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Prénom'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Veuillez saisir votre prénom';
-              }
-              return null;
-            },
-            onSaved: (value) => httpPayload.addAll({'firstname': value!}),
-          ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Nom de famille'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Veuillez saisir votre nom de famille';
-              }
-              return null;
-            },
-            onSaved: (value) => httpPayload.addAll({'lastname': value!}),
-          ),
-          DropdownButton(
-            hint: Text(_selectedLevel),
-              isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
-                DropdownMenuItem(
-                    value: 'Intermédiaire', child: Text('Intermédiaire')),
-                DropdownMenuItem(value: 'Expert', child: Text('Expert'))
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedLevel = value!;
-                });
-                httpPayload.addAll({'level': value});
-              }),
-
-          DropdownButton(
-              hint: Text(_selectedObjective ?? "Objectif"),
-              isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: 'Perte de poids', child: Text('Perte de poids')),
-                DropdownMenuItem(
-                    value: 'Prise de masse musculaire', child: Text('Prise de masse musculaire')),
-                DropdownMenuItem(value: 'Renforcement musculaire', child: Text('Renforcement musculaire')),
-                DropdownMenuItem(value: 'Améliorer son endurance', child: Text('Améliorer son endurance')),
-                DropdownMenuItem(value: 'Sèche', child: Text('Sèche'))
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedObjective = value!;
-                });
-                httpPayload.addAll({'objective': value});
-              }),
-          DropdownButton(
-              hint: Text(_selectedSex ?? "Sexe"),
-              isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: 'Homme', child: Text('Homme')),
-                DropdownMenuItem(
-                    value: 'Femme', child: Text('Femme')),
-                DropdownMenuItem(value: 'Non-binaire', child: Text('Non-binaire')),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedSex = value!;
-                });
-                httpPayload.addAll({'sex': value});
-              }),
+          Components.textFormField(
+              'Prénom',
+              'Veuillez saisir votre prénom',
+              (value) => httpPayload.addAll({'firstname': value!})),
+          Components.textFormField(
+              'Nom de famille',
+              'Veuillez saisir votre nom de famille',
+              (value) => httpPayload.addAll({'lastname': value!})),
+          Components.dropDownButton([
+            DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
+            DropdownMenuItem(
+                value: 'Intermédiaire', child: Text('Intermédiaire')),
+            DropdownMenuItem(value: 'Expert', child: Text('Expert'))
+          ], _selectedLevel, (value) {
+            setState(() {
+              _selectedLevel = value!;
+            });
+            httpPayload.addAll({'level': value});
+            print(httpPayload);
+          }, 'Niveau'),
+          Components.dropDownButton([
+            DropdownMenuItem(
+                value: 'Perte de poids', child: Text('Perte de poids')),
+            DropdownMenuItem(
+                value: 'Prise de masse musculaire',
+                child: Text('Prise de masse musculaire')),
+            DropdownMenuItem(
+                value: 'Renforcement musculaire',
+                child: Text('Renforcement musculaire')),
+            DropdownMenuItem(
+                value: 'Améliorer son endurance',
+                child: Text('Améliorer son endurance')),
+            DropdownMenuItem(value: 'Sèche', child: Text('Sèche'))
+          ], _selectedObjective, (value) {
+            setState(() {
+              _selectedObjective = value!;
+            });
+            httpPayload.addAll({'objective': value});
+            print(httpPayload);
+          }, "Objectif"),
+          Components.dropDownButton([
+            DropdownMenuItem(value: 'Homme', child: Text('Homme')),
+            DropdownMenuItem(value: 'Femme', child: Text('Femme')),
+            DropdownMenuItem(value: 'Non-binaire', child: Text('Non-binaire')),
+          ], _selectedSex, (value) {
+            setState(() {
+              _selectedSex = value!;
+            });
+            httpPayload.addAll({'sex': value});
+            print(httpPayload);
+          }, 'Sexe'),
           TextFormField(
             decoration: InputDecoration(
               labelText: 'Date de naissance',
@@ -257,16 +239,7 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             onSaved: (value) => httpPayload.addAll({'birthDate': value!}),
           ),
-          TextFormField(
-            decoration: InputDecoration(labelText: 'Ville'),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Veuilez renseigner votre ville';
-              }
-              return null;
-            },
-            onSaved: (value) => httpPayload.addAll({'city': value!}),
-          ),
+          Components.textFormField('Ville', 'Veuilez renseigner votre ville', (value) => httpPayload.addAll({'city': value!})),
           CheckboxListTile(
             title: Text('Membre d\'une salle de sport ?'),
             value: _isSubscribedToSportsHall,
@@ -278,13 +251,15 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           _isSubscribedToSportsHall
               ? DropdownButton(
-                  hint: Text(sportsHallObject['nom'] ?? 'Sélectionne ta salle de sport'),
+                  hint: Text(sportsHallObject['nom'] ??
+                      'Sélectionne ta salle de sport'),
                   isExpanded: true,
                   onChanged: (dynamic value) => {
                         setState(() {
                           sportsHallObject = value;
                         }),
-                        httpPayload['sportsHall'] = "/api/sports_halls/${value['id']}"
+                        httpPayload['sportsHall'] =
+                            "/api/sports_halls/${value['id']}"
                       },
                   items: sportHallsList.map((sporthall) {
                     return DropdownMenuItem(

@@ -73,6 +73,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  elegant_notification:
+    dependency: "direct main"
+    description:
+      name: elegant_notification
+      sha256: e2f65fe4274a8f430dc5ca9bd04c945a0b22e2407f7c2066d1ecb4a347cbb34f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.10.0"
   fake_async:
     dependency: transitive
     description:

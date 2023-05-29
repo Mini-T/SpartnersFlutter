@@ -15,7 +15,6 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> with TickerProviderStateMixin {
-  late Timer _timer;
   final AuthService authService = AuthService();
   late TabController _controller;
   UserDTO profile = UserDTO();
@@ -25,12 +24,19 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
-    _timer.cancel();
+  }
+
+  Future<void> updateInfo() async {
+    print('refresh !');
+    final res = await authService.getPersonalInfos();
+    setState(() {
+      profile = res;
+    });
   }
 
   Future<void> getLocations() async {
-    List userResult = await authService.getUsers() as List<Map<String, dynamic>> ;
-    List salleResult = await authService.getSalles() as List<Map<String, dynamic>> ;
+    List userResult = await authService.getUsers();
+    List salleResult = await authService.getSalles();
     listUser = userResult;
     listSalle = salleResult;
     setState(() {});
@@ -43,13 +49,9 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
     _controller = TabController(length: 5, vsync: this);
     _controller.addListener(() {setState(() {});});
     authService.getPersonalInfos().then((profile) {
-      setState(() => {this.profile = profile});
-    });
-    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
-      authService.getPersonalInfos().then((profile) {
-        setState(() => {this.profile = profile});
+      setState(() => {
+        this.profile = profile
       });
-
     });
     getLocations();
   }
@@ -61,10 +63,10 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
         controller: _controller,
         children: [
           HomePage(profile: profile),
-          MapView(listUser: listUser, listSalle: listSalle),
+          MapView(profile: profile, listUser: listUser, listSalle: listSalle),
           Container(),
           Container(),
-          Profile(profile: profile),
+          Profile(onRefresh: updateInfo, profile: profile, listSalle: listSalle),
         ],
       ),
       bottomNavigationBar: TabBar(
@@ -110,7 +112,7 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
             Tab(icon: Icon(
               color: _controller.index != 4 ? Color(0xFFD6D6D6) : Color(
                   0xFFFBBA00),
-              Icons.person,
+              Icons.person_pin,
               size: 38,
             )),
           ]),

@@ -34,7 +34,12 @@ class AuthService {
         city: res.data['city'],
         level: res.data['level'],
         objective: res.data['objective'],
-        description: res.data['description']);
+        description: res.data['description'],
+        age: res.data['age'],
+        sportsHall: res.data['sportsHall'],
+        latitude: res.data['latitude'],
+        longitude: res.data['longitude'],
+        joinDate: res.data['joinDate']);
     return userDTO;
   }
 
@@ -51,7 +56,6 @@ class AuthService {
 
   Future<List> getSalles() async {
     final res = await _dio.get('/api/sports_halls');
-    print(res);
     return res.data;
   }
 
@@ -67,7 +71,7 @@ class AuthService {
   }
   Future<dynamic> patchUser(Map<String, dynamic> payload) async {
     final res = await _dio.patch('/api/changeUserInformation', data: payload);
-    return res.statusCode;
+    return res;
   }
 
   Future<bool> refreshLogin() async {
@@ -117,7 +121,6 @@ class AuthService {
   Future<int?> createUser(Map<String, dynamic> userObject) async {
     try {
       var res = await http.post(Uri.parse('$apiAddress/api/users'), headers: {'Content-Type': 'application/json'}, body: jsonEncode(userObject));
-      print(res);
       return res.statusCode;
     } catch (e) {
       print(e);
