@@ -47,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> fetchSportHallsList() async {
     var res =
-        await http.get(Uri.parse('http://192.168.1.150:8000/api/choices'));
+        await http.get(Uri.parse('https://anne0080.annecy-mdstudent.yt/api/choices'));
     print(res.body);
     if (res.statusCode == 200) {
       sportHallsList = jsonDecode(res.body);

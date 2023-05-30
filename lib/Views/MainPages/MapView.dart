@@ -86,7 +86,7 @@ class MapViewState extends State<MapView> {
               await updatePosition(),
             },
           await getLocations(),
-          if(this.mounted) setState(() => loading = false)
+          if(mounted) setState(() => loading = false)
         });
   }
 
@@ -94,7 +94,9 @@ class MapViewState extends State<MapView> {
     position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
     mapController.move(LatLng(position.latitude, position.longitude), zoom);
-    authService.sendLocation(position.latitude, position.longitude);
+    if(profile.visible) {
+      authService.sendLocation(position.latitude, position.longitude);
+    }
   }
 
   Future<void> getLocations() async {
@@ -204,28 +206,6 @@ class MapViewState extends State<MapView> {
                   ? Center(
                       child: Icon(Icons.refresh, color: Colors.blue, size: 30))
                   : const GFLoader(size: 30, type: GFLoaderType.android))),
-      Positioned(
-          right: 100,
-          top: 60,
-          child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  print(mapController.zoom);
-                  mapController.move(
-                    LatLng(46.899247,
-                        7.122),
-                    13);
-                });
-              },
-              style: ButtonStyle(
-                  shape: MaterialStatePropertyAll(CircleBorder()),
-                  backgroundColor: MaterialStatePropertyAll(Colors.white),
-                  fixedSize: MaterialStatePropertyAll(Size(60, 60))),
-              child: !loading
-                  ? Center(
-                      child:
-                          Icon(Icons.person_pin, color: Colors.blue, size: 30))
-                  : const GFLoader(size: 30, type: GFLoaderType.android)))
     ]);
   }
 }

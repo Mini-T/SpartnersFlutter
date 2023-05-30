@@ -10,6 +10,16 @@ class SalleDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<dynamic> subscriber = salleInfo['subscribers'];
+    subscriber.sort((a, b) {
+      if (a['visible'] && !b['visible']) {
+        return -1;
+      } else if(!a['visible'] && b['visible']) {
+        return 1;
+
+    } else {
+        return 0;
+    }
+    },);
     return DraggableScrollableSheet(
         expand: false,
         builder: (context, scrollController) => Container(

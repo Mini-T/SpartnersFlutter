@@ -4,6 +4,7 @@ import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:spartners_app/Components.dart';
 import 'package:spartners_app/Models/UserDTO.dart';
+import 'package:spartners_app/Views/Dialogs/ProfileDialog.dart';
 import 'package:spartners_app/services/AuthService.dart';
 import 'package:get/get.dart';
 
@@ -108,7 +109,7 @@ class ProfileState extends State<Profile> {
                               child: GFButton(
                                   size: GFSize.LARGE,
                                   shape: GFButtonShape.pills,
-                                  onPressed: () => null,
+                                  onPressed: () => showDialog(context: context, builder: (context) => ProfileDialog(userInfo: profile.toMap()),),
                                   color: const Color(0xFFFBBA00),
                                   textStyle: const TextStyle(
                                       color: Colors.black,
