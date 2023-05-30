@@ -14,6 +14,7 @@ class UserDTO{
   int? sportsHall;
   int? age = null;
   String joinDate = '';
+  bool visible = false;
 
   UserDTO(
       {this.firstname = '',
@@ -28,7 +29,8 @@ class UserDTO{
         this.joinDate = '',
         this.sportsHall = null,
         this.latitude = 0,
-        this.longitude = 0
+        this.longitude = 0,
+        this.visible = false,
       });
 
   String getJoinDateInSentence(){
@@ -47,6 +49,7 @@ class UserDTO{
       '12': 'Décembre',
     };
     List<String> formattedDate = this.joinDate.split('-');
+    print(formattedDate);
     String day = formattedDate[2].toString();
     String? month = monthMap[formattedDate[1]];
     String year = formattedDate[0];
@@ -68,6 +71,7 @@ class UserDTO{
       'longitude' : longitude,
       'sportsHall' : sportsHall,
       'latitude' : latitude,
+      'visible' : visible,
     };
   }
 }

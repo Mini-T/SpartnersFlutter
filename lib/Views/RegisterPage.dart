@@ -23,6 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _confirmPasswordKey = GlobalKey<FormFieldState>();
   final _emailKey = GlobalKey<FormFieldState>();
   final _passwordKey = GlobalKey<FormFieldState>();
+  bool _isVisible = false;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
@@ -45,8 +46,8 @@ class _RegisterPageState extends State<RegisterPage> {
   _RegisterPageState({required this.tabController});
 
   Future<void> fetchSportHallsList() async {
-    var res = await http
-        .get(Uri.parse('https://anne0080.annecy-mdstudent.yt/api/choices'));
+    var res =
+        await http.get(Uri.parse('http://192.168.1.150:8000/api/choices'));
     print(res.body);
     if (res.statusCode == 200) {
       sportHallsList = jsonDecode(res.body);
@@ -166,9 +167,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Padding(
         padding: EdgeInsets.all(16.0),
         child: ListView(children: <Widget>[
-          Components.textFormField(
-              'Prénom',
-              'Veuillez saisir votre prénom',
+          Components.textFormField('Prénom', 'Veuillez saisir votre prénom',
               (value) => httpPayload.addAll({'firstname': value!})),
           Components.textFormField(
               'Nom de famille',
@@ -193,12 +192,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 value: 'Prise de masse musculaire',
                 child: Text('Prise de masse musculaire')),
             DropdownMenuItem(
-                value: 'Renforcement musculaire',
-                child: Text('Renforcement musculaire')),
-            DropdownMenuItem(
-                value: 'Améliorer son endurance',
-                child: Text('Améliorer son endurance')),
-            DropdownMenuItem(value: 'Sèche', child: Text('Sèche'))
+                value: 'Maintien de poids', child: Text('Maintien de poids')),
+            DropdownMenuItem(value: 'Cardio', child: Text('Cardio')),
           ], _selectedObjective, (value) {
             setState(() {
               _selectedObjective = value!;
@@ -239,7 +234,8 @@ class _RegisterPageState extends State<RegisterPage> {
             },
             onSaved: (value) => httpPayload.addAll({'birthDate': value!}),
           ),
-          Components.textFormField('Ville', 'Veuilez renseigner votre ville', (value) => httpPayload.addAll({'city': value!})),
+          Components.textFormField('Ville', 'Veuilez renseigner votre ville',
+              (value) => httpPayload.addAll({'city': value!})),
           CheckboxListTile(
             title: Text('Membre d\'une salle de sport ?'),
             value: _isSubscribedToSportsHall,
@@ -250,21 +246,36 @@ class _RegisterPageState extends State<RegisterPage> {
             },
           ),
           _isSubscribedToSportsHall
-              ? DropdownButton(
-                  hint: Text(sportsHallObject['nom'] ??
-                      'Sélectionne ta salle de sport'),
-                  isExpanded: true,
-                  onChanged: (dynamic value) => {
+              ? Column(
+                  children: [
+                    DropdownButton(
+                        hint: Text(sportsHallObject['nom'] ??
+                            'Sélectionne ta salle de sport'),
+                        isExpanded: true,
+                        onChanged: (dynamic value) => {
+                              setState(() {
+                                sportsHallObject = value;
+                              }),
+                              httpPayload['sportsHall'] =
+                                  "/api/sports_halls/${value['id']}"
+                            },
+                        items: sportHallsList.map((sporthall) {
+                          return DropdownMenuItem(
+                              value: sporthall, child: Text(sporthall['nom']));
+                        }).toList()),
+                    CheckboxListTile(
+                      title: Text('Apparaitre sur la map ?'),
+                      value: _isVisible,
+                      onChanged: (value) {
                         setState(() {
-                          sportsHallObject = value;
-                        }),
-                        httpPayload['sportsHall'] =
-                            "/api/sports_halls/${value['id']}"
+                          _isVisible = value!;
+                        });
+
+                        httpPayload['visible'] = value;
                       },
-                  items: sportHallsList.map((sporthall) {
-                    return DropdownMenuItem(
-                        value: sporthall, child: Text(sporthall['nom']));
-                  }).toList())
+                    ),
+                  ],
+                )
               : Container(),
           ElevatedButton(
             child: Text('Continuer'),

@@ -68,7 +68,7 @@ class Components {
     );
   }
 
-  static Widget customExpansionTile(Widget formField, dynamic field, String label) {
+  static Widget customExpansionTile(List<Widget> formField, dynamic field, String label) {
     return ExpansionTile(
       title: Row(
         children: [
@@ -89,9 +89,7 @@ class Components {
                   fontSize: 15)))
         ],
       ),
-      children: [
-        formField
-      ],
+      children: formField
     );
   }
 

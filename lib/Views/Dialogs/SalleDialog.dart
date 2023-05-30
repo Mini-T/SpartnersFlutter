@@ -47,7 +47,10 @@ class SalleDialog extends StatelessWidget {
                                         crossAxisCount: 2),
                                 shrinkWrap: true,
                                 children: subscriber.map((user) {
-                                  return Components.gridProfile(user);
+                                  if (user['visible']) {
+                                    return Components.gridProfile(user);
+                                  }
+                                  return Container();
                                 }).toList()
                               )))
                         ]),

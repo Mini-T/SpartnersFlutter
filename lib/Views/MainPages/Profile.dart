@@ -12,10 +12,14 @@ class Profile extends StatefulWidget {
   List listSalle;
   VoidCallback onRefresh;
 
-  Profile({required this.profile, required this.listSalle, required this.onRefresh});
+  Profile(
+      {required this.profile,
+      required this.listSalle,
+      required this.onRefresh});
 
   @override
-  State<StatefulWidget> createState() => ProfileState(profile: profile, listSalle: listSalle, onRefresh: onRefresh);
+  State<StatefulWidget> createState() => ProfileState(
+      profile: profile, listSalle: listSalle, onRefresh: onRefresh);
 }
 
 class ProfileState extends State<Profile> {
@@ -30,17 +34,24 @@ class ProfileState extends State<Profile> {
   String _selectedObjective = '';
   String _selectedSex = '';
   Map<String, dynamic> _selectedSportsHall = {};
+  bool _isVisible = false;
 
-  ProfileState({required this.profile, required this.listSalle, required this.onRefresh});
+  ProfileState(
+      {required this.profile,
+      required this.listSalle,
+      required this.onRefresh});
 
   @override
   void initState() {
     super.initState();
+    print(profile.toMap());
     setState(() {
       _selectedSex = profile.sex;
       _selectedLevel = profile.level;
       _selectedObjective = profile.objective;
-      _selectedSportsHall = listSalle.firstWhereOrNull((element) => element['id'] == profile.sportsHall);
+      _selectedSportsHall = listSalle
+          .firstWhereOrNull((element) => element['id'] == profile.sportsHall);
+      _isVisible = profile.visible;
     });
   }
 
@@ -108,94 +119,134 @@ class ProfileState extends State<Profile> {
                         ],
                       ))
                 ]),
-                Container(padding: const EdgeInsets.all(15), child:Text('À propos', style: TextStyle(fontFamily: 'Eras', fontSize: 20, fontWeight: FontWeight.w400))),
-                Components.customExpansionTile(Components.descFormField(
-                    initialValue: profile.description, 'Bio', (value) {
-                  if (value == profile.description) {
-                    httpPayload.remove('lastname');
-                    print('void ${httpPayload.isEmpty}');
+                Container(
+                    padding: const EdgeInsets.all(15),
+                    child: Text('À propos',
+                        style: TextStyle(
+                            fontFamily: 'Eras',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400))),
+                Components.customExpansionTile([
+                  Components.descFormField(
+                      initialValue: profile.description, 'Bio', (value) {
+                    if (value == profile.description) {
+                      httpPayload.remove('lastname');
+                      print('void ${httpPayload.isEmpty}');
+                      setState(() {});
+                      return null;
+                    }
+                    httpPayload.addAll({'description': value});
+                    print('notvoid ${httpPayload.isEmpty}');
                     setState(() {});
-                    return null;
-                  }
-                  httpPayload.addAll({'description': value});
-                  print('notvoid ${httpPayload.isEmpty}');
-                  setState(() {});
-                }), profile.description, 'Bio'),
-                Components.customExpansionTile(Components.dropDownButton(
-                    const [
-                      DropdownMenuItem(value: 'Débutant', child: Text('Débutant')),
-                      DropdownMenuItem(
-                          value: 'Intermédiaire', child: Text('Intermédiaire')),
-                      DropdownMenuItem(value: 'Expert', child: Text('Expert'))
-                    ], _selectedLevel, (value) {
-                  setState(() {
-                    _selectedLevel = value!;
-                  });
-                  if(_selectedLevel == profile.level) {
-                    httpPayload.remove('level');
-                    return null;
-                  }
-                  httpPayload.addAll({'level': value});
-                  print(httpPayload);
-                }, 'Niveau'), profile.level, 'Niveau'),
-                Components.customExpansionTile(Components.dropDownButton(
-                    const [
-                      DropdownMenuItem(value: 'Homme', child: Text('Homme')),
-                      DropdownMenuItem(value: 'Femme', child: Text('Femme')),
-                      DropdownMenuItem(value: 'Non-binaire', child: Text('Non-binaire')),
-                    ], _selectedSex, (value) {
-                  setState(() {
-                    _selectedSex = value!;
-                  });
-                  if(_selectedSex == profile.sex) {
-                    httpPayload.remove('sex');
-                    return null;
-                  }
-                  httpPayload.addAll({'sex': value});
-                  print(httpPayload);
-                }, 'Sexe'), profile.sex, 'Sexe'),
-                Components.customExpansionTile(Components.dropDownButton(
-                    const [
-                      DropdownMenuItem(
-                          value: 'Perte de poids', child: Text('Perte de poids')),
-                      DropdownMenuItem(
-                          value: 'Prise de masse musculaire',
-                          child: Text('Prise de masse musculaire')),
-                      DropdownMenuItem(
-                          value: 'Renforcement musculaire',
-                          child: Text('Renforcement musculaire')),
-                      DropdownMenuItem(
-                          value: 'Améliorer son endurance',
-                          child: Text('Améliorer son endurance')),
-                      DropdownMenuItem(value: 'Sèche', child: Text('Sèche'))
-                    ], _selectedObjective, (value) {
-                  setState(() {
-                    _selectedObjective = value!;
-                  });
-                  if(_selectedObjective == profile.objective) {
-                    httpPayload.remove('objective');
-                    return;
-                  }
-                  httpPayload.addAll({'objective': value});
-                  print(httpPayload);
-                }, 'Objectif'), profile.objective, 'Objectif'),
-                Components.customExpansionTile(Components.textFormField('Ville', 'Veuillez rentrer une ville valide', (value) {
-                  if (value == profile) {
-                    httpPayload.remove('city');
-                    return;
-                  }
-                  httpPayload.addAll({'city': value!});
-                }, initialValue: profile.city), profile.city, 'Ville'),
-                 Components.customExpansionTile(Components.dropDownButton(listSalle.map((hall) {
-                  return DropdownMenuItem(
-                  value: hall, child: Text(hall['name']));
-                }).cast<DropdownMenuItem>().toList(), _selectedSportsHall['name'], (dynamic value) => {
-                  setState(() {
-                    print(value);
-                    _selectedSportsHall = value;
-                  }),
-                  httpPayload['sportsHall'] = value['id']
-                }, "Salle de sport"), listSalle.firstWhereOrNull((element) => element['id'] == profile.sportsHall)['name'], "Salle de sport"),
+                  })
+                ], profile.description, 'Bio'),
+                Components.customExpansionTile([
+                  Components.dropDownButton(const [
+                    DropdownMenuItem(
+                        value: 'Débutant', child: Text('Débutant')),
+                    DropdownMenuItem(
+                        value: 'Intermédiaire', child: Text('Intermédiaire')),
+                    DropdownMenuItem(value: 'Expert', child: Text('Expert'))
+                  ], _selectedLevel, (value) {
+                    setState(() {
+                      _selectedLevel = value!;
+                    });
+                    if (_selectedLevel == profile.level) {
+                      httpPayload.remove('level');
+                      return null;
+                    }
+                    httpPayload.addAll({'level': value});
+                    print(httpPayload);
+                  }, 'Niveau')
+                ], profile.level, 'Niveau'),
+                Components.customExpansionTile([
+                  Components.dropDownButton(const [
+                    DropdownMenuItem(value: 'Homme', child: Text('Homme')),
+                    DropdownMenuItem(value: 'Femme', child: Text('Femme')),
+                    DropdownMenuItem(
+                        value: 'Non-binaire', child: Text('Non-binaire')),
+                  ], _selectedSex, (value) {
+                    setState(() {
+                      _selectedSex = value!;
+                    });
+                    if (_selectedSex == profile.sex) {
+                      httpPayload.remove('sex');
+                      return null;
+                    }
+                    httpPayload.addAll({'sex': value});
+                    print(httpPayload);
+                  }, 'Sexe')
+                ], profile.sex, 'Sexe'),
+                Components.customExpansionTile([
+                  Components.dropDownButton(const [
+                    DropdownMenuItem(
+                        value: 'Perte de poids', child: Text('Perte de poids')),
+                    DropdownMenuItem(
+                        value: 'Prise de masse musculaire',
+                        child: Text('Prise de masse musculaire')),
+                    DropdownMenuItem(
+                        value: 'Renforcement musculaire',
+                        child: Text('Renforcement musculaire')),
+                    DropdownMenuItem(
+                        value: 'Améliorer son endurance',
+                        child: Text('Améliorer son endurance')),
+                    DropdownMenuItem(value: 'Sèche', child: Text('Sèche'))
+                  ], _selectedObjective, (value) {
+                    setState(() {
+                      _selectedObjective = value!;
+                    });
+                    if (_selectedObjective == profile.objective) {
+                      httpPayload.remove('objective');
+                      return;
+                    }
+                    httpPayload.addAll({'objective': value});
+                    print(httpPayload);
+                  }, 'Objectif')
+                ], profile.objective, 'Objectif'),
+                Components.customExpansionTile([
+                  Components.textFormField(
+                      'Ville', 'Veuillez rentrer une ville valide', (value) {
+                    if (value == profile) {
+                      httpPayload.remove('city');
+                      return;
+                    }
+                    httpPayload.addAll({'city': value!});
+                  }, initialValue: profile.city)
+                ], profile.city, 'Ville'),
+                Components.customExpansionTile(
+                    [
+                      Components.dropDownButton(
+                          listSalle
+                              .map((hall) {
+                                return DropdownMenuItem(
+                                    value: hall, child: Text(hall['name']));
+                              })
+                              .cast<DropdownMenuItem>()
+                              .toList(),
+                          _selectedSportsHall['name'],
+                          (dynamic value) => {
+                                setState(() {
+                                  print(value);
+                                  _selectedSportsHall = value;
+                                }),
+                                httpPayload['sportsHall'] = value['id']
+                              },
+                          "Salle de sport"),
+                      CheckboxListTile(
+                        title: Text('Apparaitre sur la map ?'),
+                        value: _isVisible,
+                        onChanged: (value) {
+                          setState(() {
+                            _isVisible = value!;
+                          });
+
+                          httpPayload['visible'] = value;
+                        },
+                      ),
+                    ],
+                    listSalle.firstWhereOrNull((element) =>
+                        element['id'] == profile.sportsHall)['name'],
+                    "Salle de sport"),
                 ElevatedButton(
                     onPressed: () => authService.logout().then(
                         (value) => value ? Get.offAndToNamed('/auth') : null),
@@ -211,6 +262,7 @@ class ProfileState extends State<Profile> {
                     onPressed: () {
                       if (_key.currentState!.validate()) {
                         _key.currentState!.save();
+                        print(httpPayload);
                         authService.patchUser(httpPayload).then((value) {
                           if (value.statusCode == 200) {
                             print(value.data);

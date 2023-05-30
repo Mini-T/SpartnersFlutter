@@ -66,9 +66,13 @@ class MapViewState extends State<MapView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    refreshInfo();
+    print('innit');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      placeMapOnCurrentLocation();
+      if(this.mounted) {
+        print('postFrame');
+        placeMapOnCurrentLocation();
+        refreshInfo();
+      }
     });
 
   }
@@ -82,7 +86,7 @@ class MapViewState extends State<MapView> {
               await updatePosition(),
             },
           await getLocations(),
-          setState(() => loading = false)
+          if(this.mounted) setState(() => loading = false)
         });
   }
 
@@ -98,7 +102,7 @@ class MapViewState extends State<MapView> {
     List salleResult = await authService.getSalles();
     listUser = userResult;
     listSalle = salleResult;
-    setState(() {});
+    if(this.mounted) setState(() {});
   }
 
   @override
@@ -153,8 +157,9 @@ class MapViewState extends State<MapView> {
           MarkerLayer(
               markers: listUser.isNotEmpty
                   ? listUser.map((element) {
+                    print(element.toString());
                       if (element['latitude'] != null &&
-                          element["longitude"] != null) {
+                          element["longitude"] != null && element['visible']) {
                         return Marker(
                             width: 50,
                             height: 50,

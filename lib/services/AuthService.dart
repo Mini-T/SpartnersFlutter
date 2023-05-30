@@ -12,7 +12,7 @@ class AuthService {
     return _singleton;
   }
 
-  static final apiAddress = 'https://anne0080.annecy-mdstudent.yt';
+  static final apiAddress = 'http://192.168.1.150:8000';
   final _storage = FlutterSecureStorage();
   static bool isAuthenticated = false;
   AuthService._internal();
@@ -26,6 +26,7 @@ class AuthService {
     String? jwt = await _storage.read(key: 'jwt');
     var res = await _dio.get('/api/me',
         options: Options(headers: {'Authorization': 'Bearer $jwt'}));
+    print(res.data);
     UserDTO userDTO = UserDTO(
         firstname: res.data['firstname'],
         lastname: res.data['lastname'],
@@ -39,7 +40,8 @@ class AuthService {
         sportsHall: res.data['sportsHall'],
         latitude: res.data['latitude'],
         longitude: res.data['longitude'],
-        joinDate: res.data['joinDate']);
+        joinDate: res.data['joinDate'],
+        visible: res.data['visible']);
     return userDTO;
   }
 
@@ -103,6 +105,7 @@ class AuthService {
         isAuthenticated = true;
         return isAuthenticated;
       } else {
+        print(res.body);
         print('Request failed with status: ${res.statusCode}.');
         return false;
       }
@@ -121,6 +124,7 @@ class AuthService {
   Future<int?> createUser(Map<String, dynamic> userObject) async {
     try {
       var res = await http.post(Uri.parse('$apiAddress/api/users'), headers: {'Content-Type': 'application/json'}, body: jsonEncode(userObject));
+      print(res.body);
       return res.statusCode;
     } catch (e) {
       print(e);

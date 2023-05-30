@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:getwidget/components/loader/gf_loader.dart';
+import 'package:getwidget/types/gf_loader_type.dart';
 import 'package:spartners_app/Models/UserDTO.dart';
 import 'package:spartners_app/Views/MainPages/HomePage.dart';
 import 'package:spartners_app/Views/MainPages/Profile.dart';
@@ -17,7 +19,7 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   final AuthService authService = AuthService();
   late TabController _controller;
-  UserDTO profile = UserDTO();
+  UserDTO? profile = null;
   List listSalle = [];
   List listUser = [];
 
@@ -27,8 +29,8 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   }
 
   Future<void> updateInfo() async {
-    print('refresh !');
     final res = await authService.getPersonalInfos();
+
     setState(() {
       profile = res;
     });
@@ -46,34 +48,40 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _controller = TabController(length: 5, vsync: this);
-    _controller.addListener(() {setState(() {});});
+    _controller = TabController(length: 1, vsync: this);
     authService.getPersonalInfos().then((profile) {
       setState(() => {
-        this.profile = profile
+        this.profile = profile,
+      _controller = TabController(length: 5, vsync: this),
+      _controller.addListener(() {setState(() {});})
       });
     });
+    print(profile != null ? profile!.toMap() : 'noprofile');
     getLocations();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: TabBarView(
         controller: _controller,
-        children: [
-          HomePage(profile: profile),
-          MapView(profile: profile, listUser: listUser, listSalle: listSalle),
+        children: profile == null ? [const GFLoader(size: 100, type: GFLoaderType.android)] : [
+          HomePage(profile: profile!),
+          MapView(profile: profile!, listUser: listUser, listSalle: listSalle),
           Container(),
           Container(),
-          Profile(onRefresh: updateInfo, profile: profile, listSalle: listSalle),
+          Profile(onRefresh: updateInfo, profile: profile!, listSalle: listSalle),
         ],
       ),
       bottomNavigationBar: TabBar(
+        onTap: (value) {print("controller: ${_controller.index}, index: $value");},
           padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
           controller: _controller,
           indicatorColor: Colors.transparent,
-          tabs: [
+          tabs: profile == null ? [const GFLoader(size: 100, type: GFLoaderType.android)] : [
             Tab(
                 icon: SvgPicture.string(
                     color: _controller.index != 0 ? Color(0xFFD6D6D6) : Color(
