@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     invalidCredentials
-                        ? Text('Invalid credentials', style: TextStyle(color: Colors.red))
+                        ? Text('Mauvaise adresse email ou mot de passe', style: TextStyle(color: Colors.red))
                         : Container()
                   ],
                 ),

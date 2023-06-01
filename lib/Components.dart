@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:spartners_app/Views/Dialogs/ProfileDialog.dart';
 
 class Components {
   static Widget personalInfo(MapEntry<String, dynamic> userDTOField,
@@ -134,77 +135,81 @@ class Components {
         ));
   }
 
-  static Widget gridProfile(dynamic profile) {
-    return Container(
-        height: 246,
-        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          Container(
-            height: 116,
-            width: 175,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage('lib/Assets/images/running_guy.png'))),
-            child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Row(
-                      children: [
-                        Spacer(),
-                        Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8)),
-                            height: 18,
-                            width: 71,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: GFButton(
-                                    color: Colors.white,
-                                    onPressed: () {},
-                                    child: Container(
-                                        width: double.infinity,
-                                        child: Text(
-                                            textAlign: TextAlign.center,
-                                            'Voir le profil',
-                                            style: TextStyle(
-                                                fontFamily: 'CircularStd',
-                                                fontSize: 5,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black)))))),
-                        Spacer(),
-                        Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8)),
-                            height: 18,
-                            width: 71,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: GFButton(
-                                    color: Color(0xFFFBBA00),
-                                    onPressed: () {},
-                                    child: Container(
-                                        width: double.infinity,
-                                        child: Text(
-                                            textAlign: TextAlign.center,
-                                            'Envoyer un message',
-                                            style: TextStyle(
-                                                fontFamily: 'CircularStd',
-                                                fontSize: 5,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black)))))),
-                        Spacer(),
-                      ],
-                    ))),
-          ),
-          Container(
-              height: 39,
-              child: Row(
-                children: [
-                  Text('${profile["firstname"]}, ${profile['age']} ans')
-                ],
-              ))
-        ]));
+  static Widget gridProfile(dynamic profile, BuildContext context) {
+    return Container(child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Container(
+        height: 207,
+        width: 175,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            image: DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage('lib/Assets/images/running_guy.png'))),
+        child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+                margin: EdgeInsets.symmetric(vertical: 10),
+                child: Row(
+                  children: [
+                    Spacer(),
+                    Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8)),
+                        height: 18,
+                        width: 71,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: GFButton(
+                                color: Colors.white,
+                                onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        Dialog.fullscreen(
+                                            child: ProfileDialog(
+                                                userInfo: profile))),
+                                child: Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                        textAlign: TextAlign.center,
+                                        'Voir le profil',
+                                        style: TextStyle(
+                                            fontFamily: 'CircularStd',
+                                            fontSize: 5,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black)))))),
+                    Spacer(),
+                    Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8)),
+                        height: 18,
+                        width: 71,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10.0),
+                            child: GFButton(
+                                color: Color(0xFFFBBA00),
+                                onPressed: () {},
+                                child: Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                        textAlign: TextAlign.center,
+                                        'Envoyer un message',
+                                        style: TextStyle(
+                                            fontFamily: 'CircularStd',
+                                            fontSize: 5,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black)))))),
+                    Spacer(),
+                  ],
+                ))),
+      ),
+      Container(
+          height: 39,
+          child: Row(
+            children: [
+              Text('${profile["firstname"]}, ${profile['age']} ans')
+            ],
+          ))
+    ]),);
+
   }
 }

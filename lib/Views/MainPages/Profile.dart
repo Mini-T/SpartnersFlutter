@@ -5,6 +5,7 @@ import 'package:getwidget/getwidget.dart';
 import 'package:spartners_app/Components.dart';
 import 'package:spartners_app/Models/UserDTO.dart';
 import 'package:spartners_app/Views/Dialogs/ProfileDialog.dart';
+import 'package:spartners_app/Views/Settings.dart';
 import 'package:spartners_app/services/AuthService.dart';
 import 'package:get/get.dart';
 
@@ -66,12 +67,24 @@ class ProfileState extends State<Profile> {
               key: _key,
               child: ListView(children: [
                 Center(
-                    child: Container(
+                    child: Row(
+                  children: [
+                    Spacer(),
+                    Container(
                         child: Text('Profil',
                             style: TextStyle(
                                 fontFamily: 'Eras',
                                 fontSize: 30,
-                                fontWeight: FontWeight.w400)))),
+                                fontWeight: FontWeight.w400))),
+                    Spacer(),
+                    IconButton(icon: Icon(Icons.settings, size: 30), onPressed: () => showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (context) =>
+                          Settings(),
+                    ))
+                  ],
+                )),
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   Container(
                       height: 111,
@@ -109,7 +122,11 @@ class ProfileState extends State<Profile> {
                               child: GFButton(
                                   size: GFSize.LARGE,
                                   shape: GFButtonShape.pills,
-                                  onPressed: () => showDialog(context: context, builder: (context) => ProfileDialog(userInfo: profile.toMap()),),
+                                  onPressed: () => showDialog(
+                                        context: context,
+                                        builder: (context) => ProfileDialog(
+                                            userInfo: profile.toMap()),
+                                      ),
                                   color: const Color(0xFFFBBA00),
                                   textStyle: const TextStyle(
                                       color: Colors.black,
@@ -248,10 +265,6 @@ class ProfileState extends State<Profile> {
                     listSalle.firstWhereOrNull((element) =>
                         element['id'] == profile.sportsHall)['name'],
                     "Salle de sport"),
-                ElevatedButton(
-                    onPressed: () => authService.logout().then(
-                        (value) => value ? Get.offAndToNamed('/auth') : null),
-                    child: Text('Logout'))
               ])),
         ),
         httpPayload.isEmpty

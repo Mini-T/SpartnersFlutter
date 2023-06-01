@@ -40,6 +40,7 @@ class SalleDialog extends StatelessWidget {
                             width:
                                 (MediaQuery.of(context).size.width / 3) * 1.5,
                           )),
+                          Text(salleInfo['city'], style: TextStyle(fontFamily: 'Eras',color: Colors.black54, fontWeight: FontWeight.w400, fontSize: 13),),
                           Text(salleInfo['name'],
                               style: const TextStyle(
                                   fontFamily: 'Eras',
@@ -52,13 +53,14 @@ class SalleDialog extends StatelessWidget {
                                   child: GridView(
                                 gridDelegate:
                                     SliverGridDelegateWithFixedCrossAxisCount(
+                                      childAspectRatio: 175 / 280,
                                         crossAxisSpacing: 10,
                                         mainAxisSpacing: 10,
                                         crossAxisCount: 2),
                                 shrinkWrap: true,
                                 children: subscriber.map((user) {
                                   if (user['visible']) {
-                                    return Components.gridProfile(user);
+                                    return Components.gridProfile(user, context);
                                   }
                                   return Container();
                                 }).toList()
