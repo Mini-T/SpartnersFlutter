@@ -49,7 +49,6 @@ class UserDTO{
       '12': 'Décembre',
     };
     List<String> formattedDate = this.joinDate.split('-');
-    print(formattedDate);
     String day = formattedDate[2].toString();
     String? month = monthMap[formattedDate[1]];
     String year = formattedDate[0];

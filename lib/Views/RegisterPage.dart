@@ -48,7 +48,6 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> fetchSportHallsList() async {
     var res =
         await http.get(Uri.parse('https://anne0080.annecy-mdstudent.yt/api/choices'));
-    print(res.body);
     if (res.statusCode == 200) {
       sportHallsList = jsonDecode(res.body);
     } else {
@@ -183,7 +182,6 @@ class _RegisterPageState extends State<RegisterPage> {
               _selectedLevel = value!;
             });
             httpPayload.addAll({'level': value});
-            print(httpPayload);
           }, 'Niveau'),
           Components.dropDownButton([
             DropdownMenuItem(
@@ -199,7 +197,6 @@ class _RegisterPageState extends State<RegisterPage> {
               _selectedObjective = value!;
             });
             httpPayload.addAll({'objective': value});
-            print(httpPayload);
           }, "Objectif"),
           Components.dropDownButton([
             DropdownMenuItem(value: 'Homme', child: Text('Homme')),
@@ -210,7 +207,6 @@ class _RegisterPageState extends State<RegisterPage> {
               _selectedSex = value!;
             });
             httpPayload.addAll({'sex': value});
-            print(httpPayload);
           }, 'Sexe'),
           TextFormField(
             decoration: InputDecoration(

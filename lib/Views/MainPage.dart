@@ -56,7 +56,6 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
       _controller.addListener(() {setState(() {});})
       });
     });
-    print(profile != null ? profile!.toMap() : 'noprofile');
     getLocations();
   }
 
@@ -77,7 +76,6 @@ class MainPageState extends State<MainPage> with TickerProviderStateMixin {
         ],
       ),
       bottomNavigationBar: TabBar(
-        onTap: (value) {print("controller: ${_controller.index}, index: $value");},
           padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
           controller: _controller,
           indicatorColor: Colors.transparent,

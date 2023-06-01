@@ -22,7 +22,6 @@ class HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print(profile.firstname);
     setState(() {});
   }
 

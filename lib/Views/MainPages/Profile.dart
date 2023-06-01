@@ -46,7 +46,6 @@ class ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    print(profile.toMap());
     setState(() {
       _selectedSex = profile.sex;
       _selectedLevel = profile.level;
@@ -149,12 +148,10 @@ class ProfileState extends State<Profile> {
                       initialValue: profile.description, 'Bio', (value) {
                     if (value == profile.description) {
                       httpPayload.remove('lastname');
-                      print('void ${httpPayload.isEmpty}');
                       setState(() {});
                       return null;
                     }
                     httpPayload.addAll({'description': value});
-                    print('notvoid ${httpPayload.isEmpty}');
                     setState(() {});
                   })
                 ], profile.description, 'Bio'),
@@ -174,7 +171,6 @@ class ProfileState extends State<Profile> {
                       return null;
                     }
                     httpPayload.addAll({'level': value});
-                    print(httpPayload);
                   }, 'Niveau')
                 ], profile.level, 'Niveau'),
                 Components.customExpansionTile([
@@ -192,7 +188,6 @@ class ProfileState extends State<Profile> {
                       return null;
                     }
                     httpPayload.addAll({'sex': value});
-                    print(httpPayload);
                   }, 'Sexe')
                 ], profile.sex, 'Sexe'),
                 Components.customExpansionTile([
@@ -218,7 +213,6 @@ class ProfileState extends State<Profile> {
                       return;
                     }
                     httpPayload.addAll({'objective': value});
-                    print(httpPayload);
                   }, 'Objectif')
                 ], profile.objective, 'Objectif'),
                 Components.customExpansionTile([
@@ -244,7 +238,6 @@ class ProfileState extends State<Profile> {
                           _selectedSportsHall['name'],
                           (dynamic value) => {
                                 setState(() {
-                                  print(value);
                                   _selectedSportsHall = value;
                                 }),
                                 httpPayload['sportsHall'] = value['id']
@@ -276,10 +269,8 @@ class ProfileState extends State<Profile> {
                     onPressed: () {
                       if (_key.currentState!.validate()) {
                         _key.currentState!.save();
-                        print(httpPayload);
                         authService.patchUser(httpPayload).then((value) {
                           if (value.statusCode == 200) {
-                            print(value.data);
                             ElegantNotification.success(
                                     description: Text(
                                         'Tes informations ont été mise à jour !'))

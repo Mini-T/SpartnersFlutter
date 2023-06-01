@@ -66,10 +66,8 @@ class MapViewState extends State<MapView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('innit');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if(this.mounted) {
-        print('postFrame');
         placeMapOnCurrentLocation();
         refreshInfo();
       }
@@ -159,7 +157,6 @@ class MapViewState extends State<MapView> {
           MarkerLayer(
               markers: listUser.isNotEmpty
                   ? listUser.map((element) {
-                    print(element.toString());
                       if (element['latitude'] != null &&
                           element["longitude"] != null && element['visible']) {
                         return Marker(

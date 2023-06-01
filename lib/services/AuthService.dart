@@ -26,7 +26,6 @@ class AuthService {
     String? jwt = await _storage.read(key: 'jwt');
     var res = await _dio.get('/api/me',
         options: Options(headers: {'Authorization': 'Bearer $jwt'}));
-    print(res.data);
     UserDTO userDTO = UserDTO(
         firstname: res.data['firstname'],
         lastname: res.data['lastname'],
@@ -105,7 +104,6 @@ class AuthService {
         isAuthenticated = true;
         return isAuthenticated;
       } else {
-        print(res.body);
         print('Request failed with status: ${res.statusCode}.');
         return false;
       }
@@ -124,7 +122,6 @@ class AuthService {
   Future<int?> createUser(Map<String, dynamic> userObject) async {
     try {
       var res = await http.post(Uri.parse('$apiAddress/api/users'), headers: {'Content-Type': 'application/json'}, body: jsonEncode(userObject));
-      print(res.body);
       return res.statusCode;
     } catch (e) {
       print(e);
